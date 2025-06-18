@@ -1,0 +1,30 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/users/**
+        - id: policy-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/policies/**
+        - id: addon-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/addons/**
+        - id: admin-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/admins/**
+        - id: auth-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/auth/**
+        - id: notification-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/notifications/**
+jwt:
+  secret: your-very-secret-key 
