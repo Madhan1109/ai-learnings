@@ -7,20 +7,33 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+/**
+ * Service contract for User operations.
+ */
+public interface UserService {
+    /**
+     * Create a new user.
+     * @param user User to create
+     * @return Created User
+     */
+    User createUser(User user);
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
+    /**
+     * Get all users.
+     * @return List of users
+     */
+    List<User> getAllUsers();
 
-    public Optional<User> getUserByMobileNumber(String mobileNumber) {
-        return userRepository.findByMobileNumber(mobileNumber);
-    }
+    /**
+     * Get a user by its ID.
+     * @param id User ID
+     * @return Optional User
+     */
+    Optional<User> getUserById(Long id);
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    /**
+     * Delete a user by its ID.
+     * @param id User ID
+     */
+    void deleteUser(Long id);
 }
