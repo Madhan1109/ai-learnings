@@ -1,0 +1,1 @@
+// ... (copy the full content from the source .commitlintrc.js) 
