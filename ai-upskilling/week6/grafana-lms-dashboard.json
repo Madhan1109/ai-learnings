@@ -1,0 +1,69 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "LMS Microservices Overview",
+    "tags": ["lms", "microservices", "spring boot"],
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "HTTP Requests Rate",
+        "targets": [
+          {"expr": "sum(rate(http_server_requests_seconds_count{job=~\"user-service|course-service|enrollment-service|assessment-service|notification-service|api-gateway\"}[1m])) by (job)", "legendFormat": "{{job}}", "refId": "A"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "type": "graph",
+        "title": "JVM Memory Usage",
+        "targets": [
+          {"expr": "jvm_memory_used_bytes{area=\"heap\",job=~\"user-service|course-service|enrollment-service|assessment-service|notification-service|api-gateway\"}", "legendFormat": "{{job}}", "refId": "B"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "type": "graph",
+        "title": "Active HTTP Requests",
+        "targets": [
+          {"expr": "sum(http_server_requests_active{job=~\"user-service|course-service|enrollment-service|assessment-service|notification-service|api-gateway\"}) by (job)", "legendFormat": "{{job}}", "refId": "C"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "type": "graph",
+        "title": "RabbitMQ Message Rate",
+        "targets": [
+          {"expr": "rate(rabbitmq_queue_messages_published_total[1m])", "legendFormat": "Published", "refId": "D"},
+          {"expr": "rate(rabbitmq_queue_messages_delivered_total[1m])", "legendFormat": "Delivered", "refId": "E"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "type": "graph",
+        "title": "Redis Connected Clients",
+        "targets": [
+          {"expr": "redis_connected_clients", "legendFormat": "Clients", "refId": "F"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "type": "graph",
+        "title": "Service Health (Up)",
+        "targets": [
+          {"expr": "up{job=~\"user-service|course-service|enrollment-service|assessment-service|notification-service|api-gateway\"}", "legendFormat": "{{job}}", "refId": "G"}
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}
+      }
+    ]
+  },
+  "overwrite": false
+} 

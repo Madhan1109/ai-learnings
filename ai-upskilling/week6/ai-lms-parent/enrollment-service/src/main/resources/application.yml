@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: enrollment-service
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/lms_enrollment
+    username: postgres
+    password: postgres
+  datasource:
+    initialization-mode: always
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true 
