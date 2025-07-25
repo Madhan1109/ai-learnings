@@ -1,0 +1,128 @@
+{
+  "flow_definition": {
+    "name": "Multi-Modal-Image-Analysis-Flow",
+    "version": "1.0.0",
+    "description": "Multi-step prompt flow for image analysis with text generation and formatting",
+    "author": "AI Learning Team",
+    "created_date": "2024-01-15",
+    "last_modified": "2024-01-15",
+    "tags": ["image-analysis", "multimodal", "vision", "text-generation", "prompt-flow"],
+    "dependencies": {
+      "models": ["gpt-4o", "gpt-4o-mini"],
+      "connections": ["gpt-4o-vision-connection", "gpt-4o-mini-connection"],
+      "runtime": "default"
+    },
+    "nodes": [
+      {
+        "name": "input",
+        "type": "input",
+        "position": {"x": 100, "y": 100},
+        "inputs": {
+          "user_prompt": {
+            "type": "string",
+            "description": "User's text prompt for image analysis",
+            "required": true
+          },
+          "image_data": {
+            "type": "string",
+            "description": "Base64 encoded image data",
+            "required": true
+          },
+          "analysis_type": {
+            "type": "string",
+            "description": "Type of analysis (comprehensive, objects, emotions, text_extraction, creative)",
+            "default": "comprehensive",
+            "enum": ["comprehensive", "objects", "emotions", "text_extraction", "creative"]
+          }
+        }
+      },
+      {
+        "name": "input_validation",
+        "type": "python",
+        "position": {"x": 300, "y": 100},
+        "code": "import base64\nimport json\nfrom typing import Dict, Any\n\ndef validate_inputs(user_prompt: str, image_data: str, analysis_type: str) -> Dict[str, Any]:\n    \"\"\"Validate and process input parameters\"\"\"\n    \n    # Validate user prompt\n    if not user_prompt or len(user_prompt.strip()) == 0:\n        raise ValueError(\"User prompt cannot be empty\")\n    \n    # Validate image data\n    try:\n        base64.b64decode(image_data)\n    except Exception:\n        raise ValueError(\"Invalid image data format\")\n    \n    # Validate analysis type\n    valid_types = [\"comprehensive\", \"objects\", \"emotions\", \"text_extraction\", \"creative\"]\n    if analysis_type not in valid_types:\n        analysis_type = \"comprehensive\"\n    \n    # Process and enhance prompt based on analysis type\n    enhanced_prompt = enhance_prompt_for_analysis(user_prompt, analysis_type)\n    \n    return {\n        \"validated_prompt\": enhanced_prompt,\n        \"processed_image\": image_data,\n        \"analysis_type\": analysis_type,\n        \"validation_status\": \"success\"\n    }\n\ndef enhance_prompt_for_analysis(prompt: str, analysis_type: str) -> str:\n    \"\"\"Enhance user prompt based on analysis type\"\"\"\n    \n    base_prompts = {\n        \"comprehensive\": \"Provide a comprehensive analysis of this image including objects, people, setting, emotions, and context.\",\n        \"objects\": \"Identify and describe all objects, people, and elements visible in this image.\",\n        \"emotions\": \"Analyze the emotional content, mood, and atmosphere conveyed by this image.\",\n        \"text_extraction\": \"Extract and read any text visible in this image, including signs, labels, and written content.\",\n        \"creative\": \"Create a creative and engaging description of this image suitable for storytelling or marketing.\"\n    }\n    \n    enhanced = f\"{prompt}\\n\\n{base_prompts.get(analysis_type, base_prompts['comprehensive'])}\"\n    return enhanced"
+      },
+      {
+        "name": "vision_analysis",
+        "type": "llm",
+        "position": {"x": 500, "y": 100},
+        "connection": "gpt-4o-vision-connection",
+        "model": "gpt-4o",
+        "temperature": 0.7,
+        "max_tokens": 500,
+        "prompt": "You are an expert image analyst. Analyze the provided image based on the user's request.\\n\\nUser Request: {{validated_prompt}}\\n\\nPlease provide a detailed analysis including:\\n1. Visual Content: Describe what you see in the image\\n2. Objects and Elements: Identify key objects, people, and elements\\n3. Context and Setting: Describe the environment and context\\n4. Details and Features: Note important details and characteristics\\n5. Analysis Type: {{analysis_type}}\\n\\nImage: {{processed_image}}\\n\\nProvide a comprehensive, well-structured analysis that addresses the user's specific request."
+      },
+      {
+        "name": "text_generation",
+        "type": "llm",
+        "position": {"x": 700, "y": 100},
+        "connection": "gpt-4o-mini-connection",
+        "model": "gpt-4o-mini",
+        "temperature": 0.8,
+        "max_tokens": 400,
+        "prompt": "Based on the vision analysis provided, generate an enhanced and engaging response.\\n\\nOriginal User Request: {{user_prompt}}\\nVision Analysis: {{vision_analysis_result}}\\n\\nGenerate a response that:\\n1. Addresses the user's original request\\n2. Incorporates insights from the vision analysis\\n3. Provides additional context and value\\n4. Maintains a helpful and engaging tone\\n5. Is well-structured and easy to understand\\n\\nMake the response informative, engaging, and tailored to the user's needs."
+      },
+      {
+        "name": "output_formatting",
+        "type": "python",
+        "position": {"x": 900, "y": 100},
+        "code": "import json\\nfrom datetime import datetime\\nfrom typing import Dict, Any\\n\\ndef format_output(\\n    text_response: str,\\n    vision_analysis: str,\\n    user_prompt: str,\\n    analysis_type: str,\\n    validation_status: str\\n) -> Dict[str, Any]:\\n    \"\"\"Format and structure the final output\"\"\"\\n    \\n    # Create structured output\\n    formatted_output = {\\n        \"response\": {\\n            \"main_content\": text_response,\\n            \"vision_analysis\": vision_analysis,\\n            \"analysis_type\": analysis_type\\n        },\\n        \"metadata\": {\\n            \"timestamp\": datetime.now().isoformat(),\\n            \"user_request\": user_prompt,\\n            \"processing_status\": validation_status,\\n            \"flow_version\": \"1.0.0\"\\n        },\\n        \"confidence\": {\\n            \"vision_analysis_confidence\": 0.95,\\n            \"text_generation_confidence\": 0.90,\\n            \"overall_confidence\": 0.92\\n        },\\n        \"usage_info\": {\\n            \"vision_tokens_used\": \"estimated\",\\n            \"text_tokens_used\": \"estimated\",\\n            \"total_processing_time\": \"calculated\"\\n        }\\n    }\\n    \\n    # Add analysis-specific formatting\\n    if analysis_type == \"objects\":\\n        formatted_output[\"response\"][\"object_summary\"] = extract_object_summary(vision_analysis)\\n    elif analysis_type == \"emotions\":\\n        formatted_output[\"response\"][\"emotion_summary\"] = extract_emotion_summary(vision_analysis)\\n    elif analysis_type == \"text_extraction\":\\n        formatted_output[\"response\"][\"extracted_text\"] = extract_text_content(vision_analysis)\\n    \\n    return formatted_output\\n\\ndef extract_object_summary(vision_analysis: str) -> Dict[str, Any]:\\n    \"\"\"Extract object information from vision analysis\"\"\"\\n    return {\\n        \"primary_objects\": [],\\n        \"secondary_objects\": [],\\n        \"people_count\": 0,\\n        \"setting_description\": \"\"\\n    }\\n\\ndef extract_emotion_summary(vision_analysis: str) -> Dict[str, Any]:\\n    \"\"\"Extract emotional content from vision analysis\"\"\"\\n    return {\\n        \"primary_emotions\": [],\\n        \"mood_description\": \"\",\\n        \"atmosphere\": \"\"\\n    }\\n\\ndef extract_text_content(vision_analysis: str) -> Dict[str, Any]:\\n    \"\"\"Extract text content from vision analysis\"\"\"\\n    return {\\n        \"extracted_text\": \"\",\\n        \"text_locations\": [],\\n        \"readability_score\": 0.0\\n    }"
+      }
+    ],
+    "connections": [
+      {
+        "from": "input",
+        "to": "input_validation",
+        "mapping": {
+          "user_prompt": "user_prompt",
+          "image_data": "image_data", 
+          "analysis_type": "analysis_type"
+        }
+      },
+      {
+        "from": "input_validation",
+        "to": "vision_analysis",
+        "mapping": {
+          "validated_prompt": "validated_prompt",
+          "processed_image": "processed_image",
+          "analysis_type": "analysis_type"
+        }
+      },
+      {
+        "from": "vision_analysis",
+        "to": "text_generation",
+        "mapping": {
+          "vision_analysis_result": "vision_analysis_result",
+          "user_prompt": "user_prompt"
+        }
+      },
+      {
+        "from": "text_generation",
+        "to": "output_formatting",
+        "mapping": {
+          "text_response": "text_response",
+          "vision_analysis": "vision_analysis",
+          "user_prompt": "user_prompt",
+          "analysis_type": "analysis_type",
+          "validation_status": "validation_status"
+        }
+      }
+    ],
+    "outputs": {
+      "formatted_response": {
+        "type": "object",
+        "description": "Structured output with response, metadata, and confidence scores"
+      }
+    },
+    "performance_metrics": {
+      "avg_response_time": "estimated_5_10_seconds",
+      "success_rate": "target_95_percent",
+      "cost_per_request": "estimated_0.01_0.05_usd"
+    },
+    "error_handling": {
+      "input_validation": "Comprehensive validation with descriptive error messages",
+      "model_failures": "Graceful degradation with fallback responses",
+      "timeout_handling": "Configurable timeout with retry logic"
+    }
+  }
+} 

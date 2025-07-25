@@ -1,0 +1,356 @@
+{
+  "test_cases": {
+    "flow_name": "Multi-Modal-Image-Analysis-Flow",
+    "version": "1.0.0",
+    "description": "Test cases for multi-step prompt flow with different image types and analysis scenarios",
+    "test_scenarios": [
+      {
+        "test_id": "TC001",
+        "name": "Comprehensive Analysis - Landscape Image",
+        "description": "Test comprehensive analysis of a landscape image",
+        "analysis_type": "comprehensive",
+        "user_prompt": "What's happening in this landscape?",
+        "expected_image_type": "landscape_nature.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should include terrain, vegetation, weather, and natural features",
+          "text_generation": "Should provide context about the landscape and its characteristics",
+          "confidence_score": ">0.90"
+        },
+        "validation_criteria": [
+          "Vision analysis includes environmental details",
+          "Text generation provides geographical context",
+          "Response is well-structured and informative"
+        ]
+      },
+      {
+        "test_id": "TC002",
+        "name": "Object Identification - Urban Scene",
+        "description": "Test object identification in an urban environment",
+        "analysis_type": "objects",
+        "user_prompt": "What objects and buildings can you see?",
+        "expected_image_type": "urban_cityscape.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should identify buildings, vehicles, people, and urban infrastructure",
+          "text_generation": "Should categorize and describe objects found",
+          "confidence_score": ">0.85"
+        },
+        "validation_criteria": [
+          "Objects are accurately identified",
+          "Categories are properly organized",
+          "Descriptions are detailed and accurate"
+        ]
+      },
+      {
+        "test_id": "TC003",
+        "name": "Emotional Analysis - Portrait",
+        "description": "Test emotional content analysis of a portrait",
+        "analysis_type": "emotions",
+        "user_prompt": "What emotions does this person convey?",
+        "expected_image_type": "portrait_person.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should analyze facial expressions, mood, and emotional indicators",
+          "text_generation": "Should interpret emotional context and atmosphere",
+          "confidence_score": ">0.80"
+        },
+        "validation_criteria": [
+          "Emotional indicators are identified",
+          "Mood and atmosphere are described",
+          "Context is considered in emotional interpretation"
+        ]
+      },
+      {
+        "test_id": "TC004",
+        "name": "Text Extraction - Document",
+        "description": "Test text extraction from a document image",
+        "analysis_type": "text_extraction",
+        "user_prompt": "Read the text in this document",
+        "expected_image_type": "document_with_text.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should identify and read all visible text",
+          "text_generation": "Should organize and present extracted text clearly",
+          "confidence_score": ">0.95"
+        },
+        "validation_criteria": [
+          "All text is accurately extracted",
+          "Text is properly formatted",
+          "Readability is maintained"
+        ]
+      },
+      {
+        "test_id": "TC005",
+        "name": "Creative Description - Artwork",
+        "description": "Test creative description of an artwork",
+        "analysis_type": "creative",
+        "user_prompt": "Create a creative story about this artwork",
+        "expected_image_type": "artwork_painting.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should analyze artistic elements, style, and composition",
+          "text_generation": "Should create engaging narrative or creative description",
+          "confidence_score": ">0.85"
+        },
+        "validation_criteria": [
+          "Artistic elements are identified",
+          "Creative narrative is engaging",
+          "Style and composition are considered"
+        ]
+      },
+      {
+        "test_id": "TC006",
+        "name": "Complex Scene - Event",
+        "description": "Test analysis of a complex event scene",
+        "analysis_type": "comprehensive",
+        "user_prompt": "Describe this event and what's happening",
+        "expected_image_type": "event_gathering.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should identify event type, participants, activities, and setting",
+          "text_generation": "Should provide context about the event and its significance",
+          "confidence_score": ">0.90"
+        },
+        "validation_criteria": [
+          "Event type is correctly identified",
+          "Activities and participants are described",
+          "Context and significance are provided"
+        ]
+      },
+      {
+        "test_id": "TC007",
+        "name": "Technical Analysis - Product",
+        "description": "Test technical analysis of a product image",
+        "analysis_type": "objects",
+        "user_prompt": "What are the technical features of this product?",
+        "expected_image_type": "product_technical.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should identify product components, features, and specifications",
+          "text_generation": "Should explain technical aspects and functionality",
+          "confidence_score": ">0.85"
+        },
+        "validation_criteria": [
+          "Technical features are accurately identified",
+          "Functionality is explained",
+          "Specifications are detailed"
+        ]
+      },
+      {
+        "test_id": "TC008",
+        "name": "Mood Analysis - Abstract",
+        "description": "Test mood analysis of abstract imagery",
+        "analysis_type": "emotions",
+        "user_prompt": "What mood or feeling does this abstract image convey?",
+        "expected_image_type": "abstract_art.jpg",
+        "expected_outputs": {
+          "vision_analysis": "Should analyze colors, patterns, and abstract elements",
+          "text_generation": "Should interpret emotional and atmospheric qualities",
+          "confidence_score": ">0.75"
+        },
+        "validation_criteria": [
+          "Abstract elements are identified",
+          "Mood interpretation is provided",
+          "Atmospheric qualities are described"
+        ]
+      }
+    ],
+    "image_types": {
+      "landscape_nature.jpg": {
+        "description": "Natural landscape with mountains, trees, and sky",
+        "size": "2.5MB",
+        "format": "JPEG",
+        "dimensions": "1920x1080",
+        "content": "Outdoor natural scene"
+      },
+      "urban_cityscape.jpg": {
+        "description": "Urban cityscape with buildings, streets, and vehicles",
+        "size": "3.1MB",
+        "format": "JPEG", 
+        "dimensions": "2048x1536",
+        "content": "City environment"
+      },
+      "portrait_person.jpg": {
+        "description": "Portrait of a person with clear facial expressions",
+        "size": "1.8MB",
+        "format": "JPEG",
+        "dimensions": "1200x1600",
+        "content": "Human portrait"
+      },
+      "document_with_text.jpg": {
+        "description": "Document with clearly visible text content",
+        "size": "1.2MB",
+        "format": "JPEG",
+        "dimensions": "1654x2340",
+        "content": "Text document"
+      },
+      "artwork_painting.jpg": {
+        "description": "Artistic painting with creative elements",
+        "size": "2.8MB",
+        "format": "JPEG",
+        "dimensions": "1800x1200",
+        "content": "Artistic work"
+      },
+      "event_gathering.jpg": {
+        "description": "Event or gathering with multiple people",
+        "size": "3.5MB",
+        "format": "JPEG",
+        "dimensions": "2560x1440",
+        "content": "Social event"
+      },
+      "product_technical.jpg": {
+        "description": "Technical product with visible features",
+        "size": "2.2MB",
+        "format": "JPEG",
+        "dimensions": "1600x1200",
+        "content": "Technical product"
+      },
+      "abstract_art.jpg": {
+        "description": "Abstract artwork with colors and patterns",
+        "size": "1.9MB",
+        "format": "JPEG",
+        "dimensions": "1400x1400",
+        "content": "Abstract art"
+      }
+    },
+    "performance_benchmarks": {
+      "response_time": {
+        "target": "<10 seconds",
+        "acceptable": "<15 seconds",
+        "unacceptable": ">20 seconds"
+      },
+      "accuracy": {
+        "vision_analysis": ">90%",
+        "text_generation": ">85%",
+        "overall": ">88%"
+      },
+      "confidence_scores": {
+        "minimum": 0.75,
+        "target": 0.90,
+        "excellent": 0.95
+      }
+    },
+    "error_testing": {
+      "invalid_inputs": [
+        {
+          "test_id": "ERR001",
+          "name": "Empty User Prompt",
+          "input": {
+            "user_prompt": "",
+            "image_data": "valid_base64_image",
+            "analysis_type": "comprehensive"
+          },
+          "expected_error": "User prompt cannot be empty"
+        },
+        {
+          "test_id": "ERR002", 
+          "name": "Invalid Image Data",
+          "input": {
+            "user_prompt": "Test prompt",
+            "image_data": "invalid_base64_data",
+            "analysis_type": "comprehensive"
+          },
+          "expected_error": "Invalid image data format"
+        },
+        {
+          "test_id": "ERR003",
+          "name": "Invalid Analysis Type",
+          "input": {
+            "user_prompt": "Test prompt",
+            "image_data": "valid_base64_image",
+            "analysis_type": "invalid_type"
+          },
+          "expected_behavior": "Should default to comprehensive analysis"
+        },
+        {
+          "test_id": "ERR004",
+          "name": "Large Image File",
+          "input": {
+            "user_prompt": "Test prompt",
+            "image_data": "very_large_base64_image",
+            "analysis_type": "comprehensive"
+          },
+          "expected_error": "Image size exceeds 20MB limit"
+        }
+      ],
+      "model_failures": [
+        {
+          "test_id": "MODEL001",
+          "name": "Vision Model Unavailable",
+          "scenario": "GPT-4o Vision model is down",
+          "expected_behavior": "Graceful error handling with informative message"
+        },
+        {
+          "test_id": "MODEL002",
+          "name": "Text Model Unavailable", 
+          "scenario": "GPT-4o-mini model is down",
+          "expected_behavior": "Return vision analysis only with fallback message"
+        }
+      ]
+    },
+    "integration_testing": {
+      "end_to_end": [
+        {
+          "test_id": "E2E001",
+          "name": "Complete Flow Execution",
+          "description": "Test complete flow from input to formatted output",
+          "steps": [
+            "Provide valid input with image and prompt",
+            "Execute all 4 flow steps",
+            "Verify structured output format",
+            "Check metadata and confidence scores"
+          ],
+          "success_criteria": [
+            "All steps execute successfully",
+            "Output format matches specification",
+            "Confidence scores are reasonable",
+            "Processing time is within limits"
+          ]
+        }
+      ],
+      "load_testing": {
+        "concurrent_requests": {
+          "light_load": "5 concurrent requests",
+          "medium_load": "10 concurrent requests", 
+          "heavy_load": "20 concurrent requests"
+        },
+        "performance_expectations": {
+          "light_load": "All requests complete within 15 seconds",
+          "medium_load": "90% of requests complete within 20 seconds",
+          "heavy_load": "80% of requests complete within 30 seconds"
+        }
+      }
+    },
+    "quality_assurance": {
+      "output_validation": {
+        "required_fields": [
+          "response.main_content",
+          "response.vision_analysis", 
+          "response.analysis_type",
+          "metadata.timestamp",
+          "metadata.user_request",
+          "metadata.processing_status",
+          "metadata.flow_version",
+          "confidence.vision_analysis_confidence",
+          "confidence.text_generation_confidence",
+          "confidence.overall_confidence"
+        ],
+        "data_types": {
+          "response.main_content": "string",
+          "response.vision_analysis": "string",
+          "response.analysis_type": "string",
+          "metadata.timestamp": "string (ISO format)",
+          "confidence.vision_analysis_confidence": "number (0-1)",
+          "confidence.text_generation_confidence": "number (0-1)",
+          "confidence.overall_confidence": "number (0-1)"
+        }
+      },
+      "content_quality": {
+        "vision_analysis": {
+          "minimum_length": "50 characters",
+          "should_include": ["visual content", "objects", "context"],
+          "tone": "professional and descriptive"
+        },
+        "text_generation": {
+          "minimum_length": "100 characters", 
+          "should_include": ["original request", "vision insights", "additional context"],
+          "tone": "helpful and engaging"
+        }
+      }
+    }
+  }
+} 

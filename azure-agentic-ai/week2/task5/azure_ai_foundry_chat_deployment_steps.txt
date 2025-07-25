@@ -1,0 +1,49 @@
+Step-by-Step Guide: Deploy Azure AI Foundry Chat Template
+========================================================
+
+1. **Install Azure Developer CLI (azd)**
+   - Go to: https://aka.ms/azure-dev/install
+   - Download and install the CLI for your OS (Windows, macOS, or Linux).
+   - After installation, verify by running in your terminal:
+     azd version
+
+2. **Sign in to Azure**
+   - Open a terminal (Command Prompt, PowerShell, or Azure Cloud Shell).
+   - Run:
+     azd auth login
+   - Follow the prompts to authenticate with your Azure account.
+
+3. **Clone the Official AI Chat Template**
+   - In your terminal, navigate to your desired directory:
+     cd C:\ai-learnings\ai-learnings\azure-agentic-ai\week2\task4
+   - Clone the template repository:
+     git clone https://github.com/Azure-Samples/ai-foundry-chat-template.git
+   - Change into the cloned directory:
+     cd ai-foundry-chat-template
+
+4. **Initialize the Project**
+   - Run:
+     azd init
+   - Follow the prompts to select the project and environment name.
+
+5. **Deploy the Chat Application**
+   - Run:
+     azd up
+   - This command will provision Azure resources and deploy the application. It may take several minutes.
+   - Follow any prompts (e.g., select subscription, location).
+
+6. **Test the Deployed Chat Application**
+   - After deployment, azd will output the application endpoint URL.
+   - Open the URL in your browser to access and test the chat application.
+
+7. **Explore Azure AI Foundry Portal and Deployed Resources**
+   - Go to the Azure Portal: https://portal.azure.com
+   - Navigate to the resource group created by azd (the name will be shown in the azd output).
+   - Review the deployed resources (Web App, AI services, etc.).
+   - Optionally, visit the Azure AI Foundry portal for additional management features.
+
+---
+
+**Notes:**
+- Ensure you have the necessary Azure permissions to create resources.
+- You may incur costs for deployed resources. Clean up by running `azd down` when finished. 
