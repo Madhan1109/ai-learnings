@@ -19,5 +19,5 @@ echo "========================================"
 echo "   All Services Stopped Successfully!"
 echo "========================================"
 echo
-echo "To start services again, run: ./start-backend.sh"
+echo "To start services again, run: ./start-up-scripts/start-backend.sh"
 echo 

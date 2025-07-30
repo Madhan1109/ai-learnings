@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "========================================"
-echo "   CRM System Backend Startup"
+echo "   CRM System Individual Service Startup"
 echo "========================================"
 echo
 
@@ -14,6 +14,6 @@ fi
 # Make scripts executable
 chmod +x start-up-scripts/*.sh
 
-# Run the main startup script
-echo "Running startup script..."
-./start-up-scripts/start-backend.sh 
+# Run the individual startup script
+echo "Running individual startup script..."
+./start-up-scripts/start-backend-individual.sh 

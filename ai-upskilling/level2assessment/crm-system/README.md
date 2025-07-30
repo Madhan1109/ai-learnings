@@ -93,27 +93,35 @@ npm start
 
 ### **Option 1: Docker Compose (Recommended)**
 ```bash
-# Start all services with Docker Compose
-start-backend.bat
+# Start all services with Docker Compose (includes Maven build)
+./start-backend.sh
 ```
 
 ### **Option 2: Individual Services (Development)**
 ```bash
-# Start services individually for development
-start-backend-individual.bat
+# Start services individually for development (includes Maven build)
+./start-backend-individual.sh
 ```
 
 ### **Health Check**
 ```bash
 # Check health of all services
-health-check.bat
+./health-check.sh
 ```
 
 ### **Stop Services**
 ```bash
 # Stop all services
-stop-backend.bat
+./stop-backend.sh
 ```
+
+### **Script Organization**
+All scripts are organized in the `start-up-scripts/` folder:
+- `start-up-scripts/start-backend.sh` - Main Docker Compose startup
+- `start-up-scripts/start-backend-individual.sh` - Individual service startup
+- `start-up-scripts/stop-backend.sh` - Service shutdown
+- `start-up-scripts/health-check.sh` - Health monitoring
+- `start-up-scripts/deploy.sh` - Deployment script
 
 ## 📊 Features
 
