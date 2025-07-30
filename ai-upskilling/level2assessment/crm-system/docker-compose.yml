@@ -1,0 +1,194 @@
+version: '3.8'
+
+services:
+  # Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: crm-postgres
+    environment:
+      POSTGRES_DB: crm_system
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crm-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: crm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - crm-network
+
+  # Apache Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: crm-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - crm-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: crm-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - crm-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: crm-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+    depends_on:
+      - eureka
+    networks:
+      - crm-network
+
+  # Service Discovery
+  eureka:
+    build:
+      context: ./backend/eureka-service
+      dockerfile: Dockerfile
+    container_name: crm-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - crm-network
+
+  # Customer Service
+  customer-service:
+    build:
+      context: ./backend/customer-service
+      dockerfile: Dockerfile
+    container_name: crm-customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crm_system
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+      - eureka
+    networks:
+      - crm-network
+
+  # Sales Service
+  sales-service:
+    build:
+      context: ./backend/sales-service
+      dockerfile: Dockerfile
+    container_name: crm-sales-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crm_system
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+      - eureka
+    networks:
+      - crm-network
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./backend/analytics-service
+      dockerfile: Dockerfile
+    container_name: crm-analytics-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crm_system
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+      - eureka
+    networks:
+      - crm-network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
+    container_name: crm-auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crm_system
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+      - eureka
+    networks:
+      - crm-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./backend/notification-service
+      dockerfile: Dockerfile
+    container_name: crm-notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      SPRING_REDIS_HOST: redis
+    depends_on:
+      - redis
+      - eureka
+    networks:
+      - crm-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: crm-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - crm-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  crm-network:
+    driver: bridge 

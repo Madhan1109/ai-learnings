@@ -1,0 +1,149 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notification-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crm_system
+    username: crm_user
+    password: crm_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+  
+  cloud:
+    discovery:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# WebSocket Configuration
+websocket:
+  allowed-origins: "*"
+  endpoint: /ws
+  topic-prefix: /topic
+  app-prefix: /app
+
+# Notification Service Configuration
+notification:
+  email:
+    enabled: true
+    smtp-host: smtp.gmail.com
+    smtp-port: 587
+    username: ${EMAIL_USERNAME:}
+    password: ${EMAIL_PASSWORD:}
+  
+  sms:
+    enabled: false
+    provider: twilio
+    account-sid: ${TWILIO_ACCOUNT_SID:}
+    auth-token: ${TWILIO_AUTH_TOKEN:}
+  
+  push:
+    enabled: true
+    firebase:
+      project-id: ${FIREBASE_PROJECT_ID:}
+      private-key-id: ${FIREBASE_PRIVATE_KEY_ID:}
+      private-key: ${FIREBASE_PRIVATE_KEY:}
+      client-email: ${FIREBASE_CLIENT_EMAIL:}
+      client-id: ${FIREBASE_CLIENT_ID:}
+  
+  real-time:
+    enabled: true
+    websocket:
+      enabled: true
+      max-sessions: 1000
+      heartbeat-interval: 30000
+      heartbeat-timeout: 60000
+
+# AI-Powered Notification Features
+ai:
+  notification:
+    smart-routing:
+      enabled: true
+    priority-scoring:
+      enabled: true
+    personalization:
+      enabled: true
+    timing-optimization:
+      enabled: true
+    channel-optimization:
+      enabled: true
+
+logging:
+  level:
+    com.crm.notificationservice: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000 # 5 minutes
+      cache-null-values: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Security Configuration
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-secret-key-here}
+    expiration: 86400000 # 24 hours
+    refresh-expiration: 604800000 # 7 days
+
+# Rate Limiting
+rate-limit:
+  notifications:
+    per-minute: 60
+    per-hour: 1000
+    per-day: 10000
+
+# Notification Templates
+templates:
+  email:
+    welcome: "Welcome to our CRM system, {{name}}!"
+    lead-assigned: "New lead assigned: {{leadName}} - {{company}}"
+    deal-update: "Deal update: {{dealName}} - {{stage}}"
+    task-reminder: "Task reminder: {{taskTitle}} due {{dueDate}}"
+  
+  sms:
+    urgent: "URGENT: {{message}}"
+    reminder: "Reminder: {{message}}"
+  
+  push:
+    new-lead: "New lead: {{leadName}}"
+    deal-won: "Deal won: {{dealName}} - {{amount}}"
+    task-overdue: "Task overdue: {{taskTitle}}" 

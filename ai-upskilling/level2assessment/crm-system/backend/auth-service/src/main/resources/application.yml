@@ -1,0 +1,83 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: auth-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crm_system
+    username: crm_user
+    password: crm_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+  
+  cloud:
+    discovery:
+      enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# JWT Configuration
+jwt:
+  secret: crm-system-jwt-secret-key-2024-production-ready-security
+  expiration: 86400000 # 24 hours in milliseconds
+  refresh-expiration: 604800000 # 7 days in milliseconds
+
+# Security Configuration
+security:
+  password:
+    encoder:
+      strength: 12
+  session:
+    timeout: 3600 # 1 hour
+  login:
+    max-attempts: 5
+    lock-duration: 900 # 15 minutes
+  password:
+    expiry-days: 90
+    min-length: 8
+    require-special-chars: true
+    require-numbers: true
+    require-uppercase: true
+
+# Logging Configuration
+logging:
+  level:
+    com.crm.authservice: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always 

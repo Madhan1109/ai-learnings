@@ -1,0 +1,319 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Typography,
+  Chip,
+  Slider,
+} from '@mui/material';
+import { AttachMoney, Person, CalendarToday, TrendingUp } from '@mui/icons-material';
+
+interface Opportunity {
+  id?: string;
+  title: string;
+  amount: number;
+  stage: 'prospecting' | 'qualification' | 'proposal' | 'negotiation' | 'closed-won' | 'closed-lost';
+  probability: number;
+  expectedCloseDate: string;
+  customerId?: string;
+  customerName?: string;
+  description?: string;
+  notes?: string;
+}
+
+interface OpportunityFormProps {
+  open: boolean;
+  opportunity?: Opportunity | null;
+  customers?: Array<{ id: string; name: string; company: string }>;
+  onClose: () => void;
+  onSubmit: (opportunity: Opportunity) => void;
+}
+
+const OpportunityForm: React.FC<OpportunityFormProps> = ({
+  open,
+  opportunity,
+  customers = [],
+  onClose,
+  onSubmit,
+}) => {
+  const [formData, setFormData] = useState<Opportunity>({
+    title: '',
+    amount: 0,
+    stage: 'prospecting',
+    probability: 25,
+    expectedCloseDate: '',
+    customerId: '',
+    customerName: '',
+    description: '',
+    notes: '',
+  });
+
+  const [errors, setErrors] = useState<Partial<Opportunity>>({});
+
+  useEffect(() => {
+    if (opportunity) {
+      setFormData(opportunity);
+    } else {
+      setFormData({
+        title: '',
+        amount: 0,
+        stage: 'prospecting',
+        probability: 25,
+        expectedCloseDate: '',
+        customerId: '',
+        customerName: '',
+        description: '',
+        notes: '',
+      });
+    }
+    setErrors({});
+  }, [opportunity, open]);
+
+  const handleChange = (field: keyof Opportunity) => (
+    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
+  ) => {
+    const value = event.target.value as string | number;
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+  };
+
+  const handleCustomerChange = (customerId: string) => {
+    const customer = customers.find(c => c.id === customerId);
+    setFormData(prev => ({
+      ...prev,
+      customerId,
+      customerName: customer?.name || '',
+    }));
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Opportunity> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    }
+
+    if (formData.amount <= 0) {
+      newErrors.amount = 'Amount must be greater than 0';
+    }
+
+    if (!formData.expectedCloseDate) {
+      newErrors.expectedCloseDate = 'Expected close date is required';
+    }
+
+    if (!formData.customerId) {
+      newErrors.customerId = 'Customer is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSubmit(formData);
+      onClose();
+    }
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const getStageColor = (stage: string) => {
+    switch (stage) {
+      case 'prospecting': return 'default';
+      case 'qualification': return 'info';
+      case 'proposal': return 'warning';
+      case 'negotiation': return 'secondary';
+      case 'closed-won': return 'success';
+      case 'closed-lost': return 'error';
+      default: return 'default';
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AttachMoney />
+          <Typography variant="h6">
+            {opportunity ? 'Edit Opportunity' : 'Add New Opportunity'}
+          </Typography>
+        </Box>
+      </DialogTitle>
+      
+      <DialogContent>
+        <Grid container spacing={3} sx={{ mt: 1 }}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Opportunity Title"
+              value={formData.title}
+              onChange={handleChange('title')}
+              error={!!errors.title}
+              helperText={errors.title}
+              required
+            />
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Amount"
+              type="number"
+              value={formData.amount}
+              onChange={handleChange('amount')}
+              error={!!errors.amount}
+              helperText={errors.amount}
+              InputProps={{
+                startAdornment: <AttachMoney color="action" />,
+              }}
+              required
+            />
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Customer</InputLabel>
+              <Select
+                value={formData.customerId}
+                label="Customer"
+                onChange={(e) => handleCustomerChange(e.target.value as string)}
+                error={!!errors.customerId}
+              >
+                {customers.map((customer) => (
+                  <MenuItem key={customer.id} value={customer.id}>
+                    {customer.name} - {customer.company}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <InputLabel>Stage</InputLabel>
+              <Select
+                value={formData.stage}
+                label="Stage"
+                onChange={handleChange('stage')}
+              >
+                <MenuItem value="prospecting">
+                  <Chip label="Prospecting" size="small" color="default" />
+                </MenuItem>
+                <MenuItem value="qualification">
+                  <Chip label="Qualification" size="small" color="info" />
+                </MenuItem>
+                <MenuItem value="proposal">
+                  <Chip label="Proposal" size="small" color="warning" />
+                </MenuItem>
+                <MenuItem value="negotiation">
+                  <Chip label="Negotiation" size="small" color="secondary" />
+                </MenuItem>
+                <MenuItem value="closed-won">
+                  <Chip label="Closed Won" size="small" color="success" />
+                </MenuItem>
+                <MenuItem value="closed-lost">
+                  <Chip label="Closed Lost" size="small" color="error" />
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Expected Close Date"
+              type="date"
+              value={formData.expectedCloseDate}
+              onChange={handleChange('expectedCloseDate')}
+              error={!!errors.expectedCloseDate}
+              helperText={errors.expectedCloseDate}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+          </Grid>
+          
+          <Grid item xs={12}>
+            <Typography variant="subtitle2" gutterBottom>
+              Probability: {formData.probability}%
+            </Typography>
+            <Slider
+              value={formData.probability}
+              onChange={(_, value) => handleChange('probability')({ target: { value } } as any)}
+              min={0}
+              max={100}
+              step={5}
+              marks={[
+                { value: 0, label: '0%' },
+                { value: 25, label: '25%' },
+                { value: 50, label: '50%' },
+                { value: 75, label: '75%' },
+                { value: 100, label: '100%' },
+              ]}
+              valueLabelDisplay="auto"
+            />
+          </Grid>
+          
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Description"
+              multiline
+              rows={3}
+              value={formData.description}
+              onChange={handleChange('description')}
+              placeholder="Describe the opportunity..."
+            />
+          </Grid>
+          
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Notes"
+              multiline
+              rows={3}
+              value={formData.notes}
+              onChange={handleChange('notes')}
+              placeholder="Add any additional notes..."
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      
+      <DialogActions>
+        <Button onClick={handleCancel} color="inherit">
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
+          {opportunity ? 'Update' : 'Create'} Opportunity
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default OpportunityForm; 
