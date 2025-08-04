@@ -25,11 +25,9 @@ interface SalesMetricsProps {
     totalRevenue: number;
     totalOpportunities: number;
     winRate: number;
-    averageDealSize: number;
+    avgDealSize: number;
     pipelineValue: number;
     conversionRate: number;
-    salesVelocity: number;
-    quotaAttainment: number;
   };
 }
 
@@ -80,7 +78,7 @@ const SalesMetrics: React.FC<SalesMetricsProps> = ({ metrics }) => {
     },
     {
       title: 'Average Deal Size',
-      value: formatCurrency(metrics.averageDealSize),
+      value: formatCurrency(metrics.avgDealSize),
       icon: <AttachMoney />,
       color: 'info',
       trend: '+5.7%',
@@ -94,14 +92,7 @@ const SalesMetrics: React.FC<SalesMetricsProps> = ({ metrics }) => {
       trend: '+1.8%',
       trendUp: true,
     },
-    {
-      title: 'Sales Velocity',
-      value: `${metrics.salesVelocity} days`,
-      icon: <Timeline />,
-      color: 'secondary',
-      trend: '-2.3%',
-      trendUp: false,
-    },
+
   ];
 
   return (
@@ -141,47 +132,7 @@ const SalesMetrics: React.FC<SalesMetricsProps> = ({ metrics }) => {
         ))}
       </Grid>
       
-      {/* Quota Attainment */}
-      <Box sx={{ mt: 4 }}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Quota Attainment
-            </Typography>
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                  {formatPercentage(metrics.quotaAttainment)}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  of annual quota achieved
-                </Typography>
-              </Box>
-              
-              <Avatar sx={{ bgcolor: metrics.quotaAttainment >= 100 ? 'success.main' : 'warning.main' }}>
-                {metrics.quotaAttainment >= 100 ? <CheckCircle /> : <Warning />}
-              </Avatar>
-            </Box>
-            
-            <LinearProgress
-              variant="determinate"
-              value={Math.min(metrics.quotaAttainment, 100)}
-              color={metrics.quotaAttainment >= 100 ? 'success' : 'primary'}
-              sx={{ height: 8, borderRadius: 4 }}
-            />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-              <Typography variant="caption" color="text.secondary">
-                0%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                100%
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
+
       
       {/* Performance Summary */}
       <Box sx={{ mt: 4 }}>

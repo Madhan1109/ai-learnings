@@ -1,4 +1,4 @@
-import { api } from './api';
+import api from './api';
 
 export interface LoginCredentials {
   username: string;
@@ -8,6 +8,7 @@ export interface LoginCredentials {
 export interface RegisterData {
   firstName: string;
   lastName: string;
+  username: string;
   email: string;
   password: string;
   company: string;
@@ -49,7 +50,7 @@ class AuthService {
 
   async register(userData: RegisterData): Promise<{ message: string }> {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await api.post('/auth/users', userData);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Registration failed');
@@ -70,7 +71,7 @@ class AuthService {
 
   async getCurrentUser(): Promise<User> {
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get('/auth/profile/1'); // Using profile endpoint
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to get user');
@@ -88,7 +89,7 @@ class AuthService {
 
   async forgotPassword(email: string): Promise<{ message: string }> {
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post('/auth/reset-password', { email });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Password reset failed');
@@ -106,9 +107,9 @@ class AuthService {
 
   async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }> {
     try {
-      const response = await api.post('/auth/change-password', {
-        currentPassword,
-        newPassword
+      const response = await api.post('/auth/users/1/change-password', {
+        oldPassword: currentPassword,
+        newPassword: newPassword
       });
       return response.data;
     } catch (error: any) {
@@ -118,7 +119,7 @@ class AuthService {
 
   async updateProfile(profileData: Partial<User>): Promise<User> {
     try {
-      const response = await api.put('/auth/profile', profileData);
+      const response = await api.put('/auth/profile/1', profileData);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Profile update failed');

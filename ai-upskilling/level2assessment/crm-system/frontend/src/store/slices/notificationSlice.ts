@@ -56,7 +56,7 @@ export const markAsRead = createAsyncThunk(
   'notifications/markAsRead',
   async (notificationId: number, { rejectWithValue }) => {
     try {
-      const response = await notificationService.markAsRead(notificationId);
+      const response = await notificationService.markAsRead(notificationId.toString());
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to mark as read');
@@ -68,10 +68,22 @@ export const sendNotification = createAsyncThunk(
   'notifications/sendNotification',
   async (notificationData: Partial<Notification>, { rejectWithValue }) => {
     try {
-      const response = await notificationService.sendNotification(notificationData);
+      const response = await notificationService.createNotification(notificationData);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to send notification');
+    }
+  }
+);
+
+export const deleteNotification = createAsyncThunk(
+  'notifications/deleteNotification',
+  async (notificationId: number, { rejectWithValue }) => {
+    try {
+      await notificationService.deleteNotification(notificationId.toString());
+      return { id: notificationId };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete notification');
     }
   }
 );
@@ -114,8 +126,9 @@ const notificationSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.notifications = action.payload.notifications;
-        state.unreadCount = action.payload.unreadCount;
+        state.notifications = action.payload.data as unknown as Notification[];
+        // Calculate unread count from the data
+        state.unreadCount = action.payload.data.filter((n: any) => !n.read).length;
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
@@ -129,7 +142,10 @@ const notificationSlice = createSlice({
         }
       })
       .addCase(sendNotification.fulfilled, (state, action) => {
-        state.notifications.unshift(action.payload);
+        state.notifications.unshift(action.payload as unknown as Notification);
+      })
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        state.notifications = state.notifications.filter(n => n.id !== action.payload.id);
       });
   },
 });

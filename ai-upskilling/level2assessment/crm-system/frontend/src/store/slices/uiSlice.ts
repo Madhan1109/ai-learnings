@@ -18,6 +18,7 @@ export interface UIState {
     open: boolean;
     anchor: 'left' | 'right' | 'top' | 'bottom';
   };
+  notifications: any[];
 }
 
 const initialState: UIState = {
@@ -38,6 +39,7 @@ const initialState: UIState = {
     open: false,
     anchor: 'left',
   },
+  notifications: [],
 };
 
 const uiSlice = createSlice({
@@ -92,6 +94,18 @@ const uiSlice = createSlice({
     closeDrawer: (state) => {
       state.drawer.open = false;
     },
+    fetchNotifications: (state, action: PayloadAction<any[]>) => {
+      state.notifications = action.payload;
+    },
+    markAsRead: (state, action: PayloadAction<string>) => {
+      const notification = state.notifications.find(n => n.id === action.payload);
+      if (notification) {
+        notification.read = true;
+      }
+    },
+    deleteNotification: (state, action: PayloadAction<string>) => {
+      state.notifications = state.notifications.filter(n => n.id !== action.payload);
+    },
   },
 });
 
@@ -107,6 +121,9 @@ export const {
   closeDialog,
   openDrawer,
   closeDrawer,
+  fetchNotifications,
+  markAsRead,
+  deleteNotification,
 } = uiSlice.actions;
 
 export default uiSlice.reducer; 

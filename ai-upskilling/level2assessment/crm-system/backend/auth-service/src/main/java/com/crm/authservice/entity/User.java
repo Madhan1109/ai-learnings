@@ -24,7 +24,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
     @Column(name = "first_name")
@@ -33,8 +33,14 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone")
     private String phoneNumber;
+
+    @Column(name = "role")
+    private String role = "USER";
+
+    @Column(name = "company")
+    private String company;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -54,10 +60,11 @@ public class User {
     @Column(name = "account_expires_at")
     private LocalDateTime accountExpiresAt;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<String> roles = new HashSet<>();
+    // Role is now a simple string column, not a collection
+    // @ElementCollection(fetch = FetchType.EAGER)
+    // @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    // @Column(name = "role")
+    // private Set<String> roles = new HashSet<>();
 
     @Column(name = "two_factor_enabled")
     private Boolean twoFactorEnabled = false;
@@ -142,8 +149,24 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
     public Boolean getIsActive() {
-        return isActive;
+        return isActive != null ? isActive : true;
     }
 
     public void setIsActive(Boolean isActive) {
@@ -151,7 +174,7 @@ public class User {
     }
 
     public Boolean getIsLocked() {
-        return isLocked;
+        return isLocked != null ? isLocked : false;
     }
 
     public void setIsLocked(Boolean isLocked) {
@@ -159,7 +182,7 @@ public class User {
     }
 
     public Integer getFailedLoginAttempts() {
-        return failedLoginAttempts;
+        return failedLoginAttempts != null ? failedLoginAttempts : 0;
     }
 
     public void setFailedLoginAttempts(Integer failedLoginAttempts) {
@@ -190,16 +213,23 @@ public class User {
         this.accountExpiresAt = accountExpiresAt;
     }
 
+    // Role methods for compatibility
     public Set<String> getRoles() {
+        Set<String> roles = new HashSet<>();
+        if (this.role != null) {
+            roles.add(this.role);
+        }
         return roles;
     }
 
     public void setRoles(Set<String> roles) {
-        this.roles = roles;
+        if (roles != null && !roles.isEmpty()) {
+            this.role = roles.iterator().next();
+        }
     }
 
     public Boolean getTwoFactorEnabled() {
-        return twoFactorEnabled;
+        return twoFactorEnabled != null ? twoFactorEnabled : false;
     }
 
     public void setTwoFactorEnabled(Boolean twoFactorEnabled) {
@@ -240,15 +270,17 @@ public class User {
 
     // Helper methods
     public void addRole(String role) {
-        this.roles.add(role);
+        this.role = role;
     }
 
     public void removeRole(String role) {
-        this.roles.remove(role);
+        if (this.role != null && this.role.equals(role)) {
+            this.role = null;
+        }
     }
 
     public boolean hasRole(String role) {
-        return this.roles.contains(role);
+        return this.role != null && this.role.equals(role);
     }
 
     public String getFullName() {
@@ -280,7 +312,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", isActive=" + isActive +
-                ", roles=" + roles +
+                //", roles=" + roles +
                 '}';
     }
 } 

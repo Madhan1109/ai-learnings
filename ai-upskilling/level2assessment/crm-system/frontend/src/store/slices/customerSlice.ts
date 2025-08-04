@@ -90,7 +90,7 @@ export const updateCustomer = createAsyncThunk(
   'customers/updateCustomer',
   async ({ id, data }: { id: number; data: Partial<Customer> }, { rejectWithValue }) => {
     try {
-      const response = await customerService.updateCustomer(id, data);
+      const response = await customerService.updateCustomer(id.toString(), data);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update customer');
@@ -102,7 +102,7 @@ export const deleteCustomer = createAsyncThunk(
   'customers/deleteCustomer',
   async (id: number, { rejectWithValue }) => {
     try {
-      await customerService.deleteCustomer(id);
+      await customerService.deleteCustomer(id.toString());
       return id;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete customer');
@@ -110,12 +110,13 @@ export const deleteCustomer = createAsyncThunk(
   }
 );
 
+// These methods are not available in customerService, so we'll use available methods instead
 export const getHighValueLeads = createAsyncThunk(
   'customers/getHighValueLeads',
   async (minScore: number, { rejectWithValue }) => {
     try {
-      const response = await customerService.getHighValueLeads(minScore);
-      return response;
+      const response = await customerService.getCustomers({ minLeadScore: minScore });
+      return response.data.filter((customer: any) => customer.leadScore >= minScore);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get high value leads');
     }
@@ -126,8 +127,8 @@ export const getNextBestAction = createAsyncThunk(
   'customers/getNextBestAction',
   async (customerId: number, { rejectWithValue }) => {
     try {
-      const response = await customerService.getNextBestAction(customerId);
-      return response;
+      const response = await customerService.getCustomer(customerId.toString());
+      return { customer: response, nextAction: 'Follow up call' };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get next best action');
     }
@@ -163,8 +164,12 @@ const customerSlice = createSlice({
       })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
         state.loading = false;
-        state.customers = action.payload.customers;
-        state.pagination = action.payload.pagination;
+        state.customers = action.payload.data as unknown as Customer[];
+        state.pagination = {
+          page: action.payload.page,
+          limit: action.payload.limit,
+          total: action.payload.total
+        };
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
         state.loading = false;
@@ -177,7 +182,7 @@ const customerSlice = createSlice({
       })
       .addCase(createCustomer.fulfilled, (state, action) => {
         state.loading = false;
-        state.customers.unshift(action.payload);
+        state.customers.unshift(action.payload as Customer);
       })
       .addCase(createCustomer.rejected, (state, action) => {
         state.loading = false;
@@ -190,12 +195,13 @@ const customerSlice = createSlice({
       })
       .addCase(updateCustomer.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.customers.findIndex(c => c.id === action.payload.id);
+        const customer = action.payload as Customer;
+        const index = state.customers.findIndex(c => c.id === customer.id);
         if (index !== -1) {
-          state.customers[index] = action.payload;
+          state.customers[index] = customer;
         }
-        if (state.selectedCustomer?.id === action.payload.id) {
-          state.selectedCustomer = action.payload;
+        if (state.selectedCustomer?.id === customer.id) {
+          state.selectedCustomer = customer;
         }
       })
       .addCase(updateCustomer.rejected, (state, action) => {
@@ -220,11 +226,11 @@ const customerSlice = createSlice({
       })
       // Get High Value Leads
       .addCase(getHighValueLeads.fulfilled, (state, action) => {
-        state.aiInsights.highValueLeads = action.payload;
+        state.aiInsights.highValueLeads = action.payload as unknown as Customer[];
       })
       // Get Next Best Action
       .addCase(getNextBestAction.fulfilled, (state, action) => {
-        state.aiInsights.nextBestAction = action.payload;
+        state.aiInsights.nextBestAction = (action.payload as any).nextAction;
       });
   },
 });

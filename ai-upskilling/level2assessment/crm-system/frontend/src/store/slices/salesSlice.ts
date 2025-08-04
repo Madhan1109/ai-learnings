@@ -6,7 +6,7 @@ export interface Opportunity {
   customerId: number;
   title: string;
   description: string;
-  amount: number;
+  value: number;
   stage: string;
   probability: number;
   expectedCloseDate: string;
@@ -39,6 +39,14 @@ export interface SalesState {
   selectedTask: Task | null;
   loading: boolean;
   error: string | null;
+  metrics: {
+    totalRevenue: number;
+    totalOpportunities: number;
+    conversionRate: number;
+    avgDealSize: number;
+    pipelineValue: number;
+    winRate: number;
+  };
   filters: {
     stage: string;
     assignedTo: number | null;
@@ -64,6 +72,14 @@ const initialState: SalesState = {
   selectedTask: null,
   loading: false,
   error: null,
+  metrics: {
+    totalRevenue: 0,
+    totalOpportunities: 0,
+    conversionRate: 0,
+    avgDealSize: 0,
+    pipelineValue: 0,
+    winRate: 0,
+  },
   filters: {
     stage: '',
     assignedTo: null,
@@ -110,7 +126,7 @@ export const updateOpportunity = createAsyncThunk(
   'sales/updateOpportunity',
   async ({ id, data }: { id: number; data: Partial<Opportunity> }, { rejectWithValue }) => {
     try {
-      const response = await salesService.updateOpportunity(id, data);
+      const response = await salesService.updateOpportunity(id.toString(), data);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update opportunity');
@@ -120,9 +136,9 @@ export const updateOpportunity = createAsyncThunk(
 
 export const fetchTasks = createAsyncThunk(
   'sales/fetchTasks',
-  async (params: { page?: number; limit?: number; filters?: any }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await salesService.getTasks(params);
+      const response = await salesService.getTasks();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch tasks');
@@ -150,6 +166,18 @@ export const getPipelineHealth = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get pipeline health');
+    }
+  }
+);
+
+export const fetchSalesMetrics = createAsyncThunk(
+  'sales/fetchSalesMetrics',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await salesService.getSalesMetrics();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch sales metrics');
     }
   }
 );
@@ -183,8 +211,12 @@ const salesSlice = createSlice({
       })
       .addCase(fetchOpportunities.fulfilled, (state, action) => {
         state.loading = false;
-        state.opportunities = action.payload.opportunities;
-        state.pagination = action.payload.pagination;
+        state.opportunities = action.payload.data as unknown as Opportunity[];
+        state.pagination = {
+          page: action.payload.page,
+          limit: action.payload.limit,
+          total: action.payload.total
+        };
       })
       .addCase(fetchOpportunities.rejected, (state, action) => {
         state.loading = false;
@@ -192,29 +224,34 @@ const salesSlice = createSlice({
       })
       // Create Opportunity
       .addCase(createOpportunity.fulfilled, (state, action) => {
-        state.opportunities.unshift(action.payload);
+        state.opportunities.unshift(action.payload as unknown as Opportunity);
       })
       // Update Opportunity
       .addCase(updateOpportunity.fulfilled, (state, action) => {
-        const index = state.opportunities.findIndex(o => o.id === action.payload.id);
+        const opportunity = action.payload as unknown as Opportunity;
+        const index = state.opportunities.findIndex(o => o.id === opportunity.id);
         if (index !== -1) {
-          state.opportunities[index] = action.payload;
+          state.opportunities[index] = opportunity;
         }
-        if (state.selectedOpportunity?.id === action.payload.id) {
-          state.selectedOpportunity = action.payload;
+        if (state.selectedOpportunity?.id === opportunity.id) {
+          state.selectedOpportunity = opportunity;
         }
       })
       // Fetch Tasks
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.tasks = action.payload.tasks;
+        state.tasks = action.payload as unknown as Task[];
       })
       // Create Task
       .addCase(createTask.fulfilled, (state, action) => {
-        state.tasks.unshift(action.payload);
+        state.tasks.unshift(action.payload as unknown as Task);
       })
       // Get Pipeline Health
       .addCase(getPipelineHealth.fulfilled, (state, action) => {
         state.aiInsights.pipelineHealth = action.payload;
+      })
+      // Fetch Sales Metrics
+      .addCase(fetchSalesMetrics.fulfilled, (state, action) => {
+        state.metrics = action.payload;
       });
   },
 });

@@ -31,20 +31,7 @@ import {
   AttachMoney,
   Assignment,
 } from '@mui/icons-material';
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  status: 'active' | 'inactive' | 'lead';
-  source: string;
-  address?: string;
-  notes?: string;
-  createdAt: string;
-  lastContact?: string;
-}
+import { Customer } from '../../store/slices/customerSlice';
 
 interface Activity {
   id: string;
@@ -55,9 +42,9 @@ interface Activity {
 }
 
 interface Opportunity {
-  id: string;
+  id: number;
   title: string;
-  amount: number;
+  value: number;
   stage: string;
   probability: number;
   expectedCloseDate: string;
@@ -70,7 +57,7 @@ interface CustomerDetailsProps {
   opportunities?: Opportunity[];
   onClose: () => void;
   onEdit: (customer: Customer) => void;
-  onDelete: (customerId: string) => void;
+  onDelete: (customerId: number) => void;
 }
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({
@@ -184,14 +171,14 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                     />
                   </ListItem>
                   
-                  {customer.address && (
+                  {customer.industry && (
                     <ListItem>
                       <ListItemIcon>
-                        <LocationOn color="action" />
+                        <Business color="action" />
                       </ListItemIcon>
                       <ListItemText
-                        primary="Address"
-                        secondary={customer.address}
+                        primary="Industry"
+                        secondary={customer.industry}
                       />
                     </ListItem>
                   )}
@@ -232,26 +219,26 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                     />
                   </ListItem>
                   
-                  {customer.lastContact && (
+                  {customer.leadScore > 0 && (
                     <ListItem>
                       <ListItemIcon>
                         <Timeline color="action" />
                       </ListItemIcon>
                       <ListItemText
-                        primary="Last Contact"
-                        secondary={formatDate(customer.lastContact)}
+                        primary="Lead Score"
+                        secondary={`${customer.leadScore}/100`}
                       />
                     </ListItem>
                   )}
                 </List>
                 
-                {customer.notes && (
+                {customer.leadScore > 0 && (
                   <Box sx={{ mt: 2 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Notes
+                      Lead Score
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {customer.notes}
+                      {customer.leadScore}/100
                     </Typography>
                   </Box>
                 )}
@@ -279,7 +266,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
                           secondary={
                             <Box>
                               <Typography variant="body2">
-                                {formatCurrency(opportunity.amount)} • {opportunity.stage}
+                                {formatCurrency(opportunity.value)} • {opportunity.stage}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">
                                 {opportunity.probability}% probability • Close by {formatDate(opportunity.expectedCloseDate)}

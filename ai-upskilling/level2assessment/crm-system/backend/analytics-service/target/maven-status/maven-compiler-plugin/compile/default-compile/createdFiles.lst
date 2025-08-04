@@ -1,0 +1,8 @@
+com\crm\analyticsservice\config\RedisConfig.class
+com\crm\analyticsservice\controller\AnalyticsController.class
+com\crm\analyticsservice\repository\AnalyticsReportRepository.class
+com\crm\analyticsservice\service\AnalyticsService.class
+com\crm\analyticsservice\entity\AnalyticsReport.class
+com\crm\analyticsservice\service\AIAnalyticsService.class
+com\crm\analyticsservice\config\SecurityConfig.class
+com\crm\analyticsservice\AnalyticsServiceApplication.class

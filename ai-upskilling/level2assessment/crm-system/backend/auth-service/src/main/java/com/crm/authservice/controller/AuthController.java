@@ -2,11 +2,14 @@ package com.crm.authservice.controller;
 
 import com.crm.authservice.entity.User;
 import com.crm.authservice.service.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,8 +17,9 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthService authService;
@@ -24,10 +28,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
+        logger.info("=== LOGIN REQUEST RECEIVED ===");
+        logger.info("Request body: {}", loginRequest);
+        
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
         
+        logger.info("Extracted username: {}", username);
+        logger.info("Extracted password: {}", password != null ? "***HIDDEN***" : "NULL");
+        
         Map<String, Object> response = authService.authenticate(username, password);
+        
+        logger.info("Authentication response: {}", response);
+        logger.info("=== LOGIN REQUEST COMPLETED ===");
+        
         return ResponseEntity.ok(response);
     }
 
@@ -264,19 +278,18 @@ public class AuthController {
         Optional<User> userOpt = authService.getUserById(id);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            Map<String, Object> profile = Map.of(
-                "id", user.getId(),
-                "username", user.getUsername(),
-                "email", user.getEmail(),
-                "firstName", user.getFirstName(),
-                "lastName", user.getLastName(),
-                "fullName", user.getFullName(),
-                "roles", user.getRoles(),
-                "isActive", user.getIsActive(),
-                "lastLogin", user.getLastLogin(),
-                "twoFactorEnabled", user.getTwoFactorEnabled(),
-                "preferences", user.getPreferences()
-            );
+            Map<String, Object> profile = new HashMap<>();
+            profile.put("id", user.getId());
+            profile.put("username", user.getUsername());
+            profile.put("email", user.getEmail());
+            profile.put("firstName", user.getFirstName());
+            profile.put("lastName", user.getLastName());
+            profile.put("fullName", user.getFullName());
+            profile.put("roles", user.getRoles());
+            profile.put("isActive", user.getIsActive());
+            profile.put("lastLogin", user.getLastLogin());
+            profile.put("twoFactorEnabled", user.getTwoFactorEnabled());
+            profile.put("preferences", user.getPreferences());
             return ResponseEntity.ok(profile);
         }
         return ResponseEntity.notFound().build();

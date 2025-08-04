@@ -24,7 +24,7 @@ import {
   Badge,
 } from '@mui/material';
 import {
-  Notifications,
+  Notifications as NotificationsIcon,
   NotificationsActive,
   NotificationsOff,
   Email,
@@ -37,23 +37,13 @@ import {
   MarkEmailRead,
   MarkEmailUnread,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { fetchNotifications, markAsRead, deleteNotification } from '../../store/slices/notificationSlice';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
+import { fetchNotifications, markAsRead, deleteNotification, Notification } from '../../store/slices/notificationSlice';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  read: boolean;
-  createdAt: string;
-  category: string;
-}
-
-const Notifications: React.FC = () => {
-  const dispatch = useDispatch();
+const NotificationsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { notifications, loading } = useSelector((state: RootState) => state.notifications);
   
   const [filter, setFilter] = useState('all');
@@ -63,11 +53,11 @@ const Notifications: React.FC = () => {
     dispatch(fetchNotifications());
   }, [dispatch]);
 
-  const handleMarkAsRead = (notificationId: string) => {
+  const handleMarkAsRead = (notificationId: number) => {
     dispatch(markAsRead(notificationId));
   };
 
-  const handleDelete = (notificationId: string) => {
+  const handleDelete = (notificationId: number) => {
     dispatch(deleteNotification(notificationId));
   };
 
@@ -89,8 +79,8 @@ const Notifications: React.FC = () => {
     }
   };
 
-  const filteredNotifications = notifications.filter((notification: Notification) => {
-    const matchesFilter = filter === 'all' || notification.category === filter;
+  const filteredNotifications = notifications.filter((notification: any) => {
+    const matchesFilter = filter === 'all' || notification.type === filter;
     const matchesReadStatus = showRead || !notification.read;
     return matchesFilter && matchesReadStatus;
   });
@@ -129,7 +119,7 @@ const Notifications: React.FC = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Badge badgeContent={unreadCount} color="error">
                   <Avatar sx={{ bgcolor: 'primary.main' }}>
-                    <Notifications />
+                    <NotificationsIcon />
                   </Avatar>
                 </Badge>
                 <Box>
@@ -244,7 +234,7 @@ const Notifications: React.FC = () => {
       {/* Notifications List */}
       <Paper>
         <List>
-          {filteredNotifications.map((notification: Notification, index: number) => (
+          {filteredNotifications.map((notification: any, index: number) => (
             <React.Fragment key={notification.id}>
               <ListItem
                 sx={{
@@ -329,4 +319,4 @@ const Notifications: React.FC = () => {
   );
 };
 
-export default Notifications; 
+export default NotificationsPage; 

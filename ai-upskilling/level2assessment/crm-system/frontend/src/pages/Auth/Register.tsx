@@ -18,7 +18,8 @@ import {
   Person,
   Email,
   Lock,
-  Business
+  Business,
+  AccountCircle
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -31,6 +32,7 @@ const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -53,6 +55,12 @@ const Register: React.FC = () => {
 
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters long';
     }
 
     if (!formData.email.trim()) {
@@ -102,6 +110,7 @@ const Register: React.FC = () => {
       const result = await dispatch(registerUser({
         firstName: formData.firstName,
         lastName: formData.lastName,
+        username: formData.username,
         email: formData.email,
         password: formData.password,
         company: formData.company,
@@ -198,6 +207,23 @@ const Register: React.FC = () => {
                   startAdornment: (
                     <InputAdornment position="start">
                       <Person color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Username"
+                value={formData.username}
+                onChange={(e) => handleInputChange('username', e.target.value)}
+                error={!!errors.username}
+                helperText={errors.username}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccountCircle color="action" />
                     </InputAdornment>
                   ),
                 }}

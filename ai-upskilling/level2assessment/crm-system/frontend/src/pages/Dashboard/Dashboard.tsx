@@ -25,8 +25,8 @@ import {
   Assignment,
   Schedule,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
 import { fetchCustomers } from '../../store/slices/customerSlice';
 import { fetchOpportunities } from '../../store/slices/salesSlice';
 import { fetchNotifications } from '../../store/slices/notificationSlice';
@@ -38,7 +38,7 @@ import CustomerChart from '../../components/Charts/CustomerChart';
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   
   const { customers } = useSelector((state: RootState) => state.customers);
   const { opportunities } = useSelector((state: RootState) => state.sales);
@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
       title: 'Total Customers',
       value: customers.length,
       icon: <People />,
-      color: 'primary',
+      color: 'primary' as const,
       trend: '+12%',
       trendUp: true,
     },
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
       title: 'Active Opportunities',
       value: opportunities.length,
       icon: <AttachMoney />,
-      color: 'success',
+      color: 'success' as const,
       trend: '+8%',
       trendUp: true,
     },
@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
       title: 'AI Insights',
       value: '24/7',
       icon: <AutoAwesome />,
-      color: 'secondary',
+      color: 'secondary' as const,
       trend: 'Real-time',
       trendUp: true,
     },
@@ -79,7 +79,7 @@ const Dashboard: React.FC = () => {
       title: 'Notifications',
       value: notifications.length,
       icon: <Notifications />,
-      color: 'warning',
+      color: 'warning' as const,
       trend: '+5',
       trendUp: false,
     },
@@ -90,19 +90,22 @@ const Dashboard: React.FC = () => {
       title: 'Lead Scoring',
       description: 'AI-powered lead scoring identifies high-value prospects',
       confidence: 95,
-      status: 'Active',
+      status: 'Active' as const,
+      type: 'success' as const,
     },
     {
       title: 'Sales Predictions',
       description: 'Machine learning predicts deal closure probability',
       confidence: 87,
-      status: 'Active',
+      status: 'Active' as const,
+      type: 'success' as const,
     },
     {
       title: 'Customer Segmentation',
       description: 'AI segments customers for targeted marketing',
       confidence: 92,
-      status: 'Active',
+      status: 'Active' as const,
+      type: 'info' as const,
     },
   ];
 

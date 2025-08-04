@@ -15,16 +15,15 @@ import {
   Visibility,
   VisibilityOff,
   Login as LoginIcon,
-  AutoAwesome as AIIcon,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import { login } from '../../store/slices/authSlice';
 
 const Login: React.FC = () => {
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
   const { loading, error } = useSelector((state: RootState) => state.auth);
@@ -100,30 +99,12 @@ const Login: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        {/* AI Badge */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            color: theme.palette.secondary.main,
-          }}
-        >
-          <AIIcon fontSize="small" />
-          <Typography variant="caption" sx={{ fontWeight: 600 }}>
-            AI-Powered
-          </Typography>
-        </Box>
-
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 1 }}>
             Welcome Back
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Sign in to your AI-Powered CRM System
+            Sign in to your CRM System
           </Typography>
         </Box>
 
@@ -194,21 +175,6 @@ const Login: React.FC = () => {
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
-        </Box>
-
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            Demo Credentials:
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-            Username: admin | Password: admin123
-          </Typography>
-        </Box>
-
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="caption" color="text.secondary">
-            Powered by AI/ML Technologies
-          </Typography>
         </Box>
       </Paper>
     </Box>

@@ -25,9 +25,9 @@ import {
   Settings as SettingsIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import { logout } from '../../store/slices/authSlice';
 import { toggleSidebar, setSidebarOpen } from '../../store/slices/uiSlice';
 import Sidebar from './Sidebar';
@@ -42,7 +42,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -209,6 +209,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <NotificationDrawer
         open={notificationDrawerOpen}
         onClose={() => setNotificationDrawerOpen(false)}
+        notifications={[]}
+        onMarkAsRead={() => {}}
+        onMarkAllAsRead={() => {}}
+        onDelete={() => {}}
       />
     </Box>
   );

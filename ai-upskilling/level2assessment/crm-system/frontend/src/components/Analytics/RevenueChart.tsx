@@ -54,7 +54,7 @@ interface RevenueChartProps {
 }
 
 const RevenueChart: React.FC<RevenueChartProps> = ({
-  data,
+  data = { labels: [], datasets: [] },
   type = 'line',
   title = 'Revenue Analytics',
   period = '30d',

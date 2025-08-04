@@ -26,7 +26,7 @@ import {
   Alert,
 } from '@mui/material';
 import {
-  Settings,
+  Settings as SettingsIcon,
   Person,
   Notifications,
   Security,
@@ -65,7 +65,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const Settings: React.FC = () => {
+const SettingsPage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   
   const [tabValue, setTabValue] = useState(0);
@@ -73,8 +73,7 @@ const Settings: React.FC = () => {
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
-    phone: user?.phone || '',
-    company: user?.company || '',
+    phone: '',
   });
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
@@ -191,14 +190,7 @@ const Settings: React.FC = () => {
                         onChange={handleProfileChange('phone')}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Company"
-                        value={profileData.company}
-                        onChange={handleProfileChange('company')}
-                      />
-                    </Grid>
+
                   </Grid>
                   <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
                     <Button
@@ -545,4 +537,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings; 
+export default SettingsPage; 

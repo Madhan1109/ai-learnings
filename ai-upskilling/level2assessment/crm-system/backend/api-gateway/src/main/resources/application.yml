@@ -11,30 +11,50 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+          predicates:
+            - name: Path
+              args:
+                pattern: "'/' + serviceId + '/**'"
+          filters:
+            - name: RewritePath
+              args:
+                regexp: "'/' + serviceId + '/(?<remaining>.*)'"
+                replacement: "'/${remaining}'"
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins: "*"
-            allowed-methods: "*"
+            allowed-origins: 
+              - "http://localhost:3000"
+              - "http://localhost:3001"
+              - "http://127.0.0.1:3000"
+              - "http://127.0.0.1:3001"
+            allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
             allowed-headers: "*"
             allow-credentials: true
             max-age: 3600
+      # Routes are configured in Java GatewayConfig.java
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 30s
+        pool:
+          max-connections: 200
+          max-idle-time: 30s
     
     discovery:
       enabled: true
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
       timeout: 2000ms
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:
@@ -83,20 +103,6 @@ resilience4j:
         failure-rate-threshold: 50
 
 # Rate Limiting Configuration
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: rate-limit-config
-          uri: lb://customer-service
-          predicates:
-            - Path=/api/customers/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenish-rate: 10
-                redis-rate-limiter.burst-capacity: 20
-                key-resolver: "#{@userKeyResolver}"
 
 # Security Configuration
 security:
@@ -131,7 +137,11 @@ logging:
 # Gateway Specific Configuration
 gateway:
   cors:
-    allowed-origins: "*"
+    allowed-origins: 
+      - "http://localhost:3000"
+      - "http://localhost:3001"
+      - "http://127.0.0.1:3000"
+      - "http://127.0.0.1:3001"
     allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
     allowed-headers: "*"
     allow-credentials: true
@@ -154,13 +164,4 @@ gateway:
     metrics-enabled: true
     tracing-enabled: true
 
-# Performance Configuration
-spring:
-  cloud:
-    gateway:
-      httpclient:
-        connect-timeout: 5000
-        response-timeout: 10s
-        pool:
-          max-connections: 200
-          max-idle-time: 30s 
+# Performance Configuration 

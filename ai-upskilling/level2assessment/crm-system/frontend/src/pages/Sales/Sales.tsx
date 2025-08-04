@@ -42,9 +42,9 @@ import {
   Delete,
   Visibility,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { fetchOpportunities, fetchSalesMetrics } from '../../store/slices/salesSlice';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
+import { fetchOpportunities, fetchSalesMetrics, createOpportunity, updateOpportunity } from '../../store/slices/salesSlice';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import OpportunityForm from '../../components/Sales/OpportunityForm';
 import SalesPipeline from '../../components/Sales/SalesPipeline';
@@ -73,7 +73,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const Sales: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { opportunities, metrics, loading } = useSelector((state: RootState) => state.sales);
   
   const [tabValue, setTabValue] = useState(0);
@@ -81,7 +81,7 @@ const Sales: React.FC = () => {
   const [selectedOpportunity, setSelectedOpportunity] = useState<any>(null);
 
   useEffect(() => {
-    dispatch(fetchOpportunities());
+    dispatch(fetchOpportunities({ page: 1, limit: 10 }));
     dispatch(fetchSalesMetrics());
   }, [dispatch]);
 
@@ -94,15 +94,25 @@ const Sales: React.FC = () => {
     setOpenForm(true);
   };
 
+  const handleSubmitOpportunity = (opportunity: any) => {
+    if (opportunity.id) {
+      dispatch(updateOpportunity(opportunity));
+    } else {
+      dispatch(createOpportunity(opportunity));
+    }
+    setOpenForm(false);
+    setSelectedOpportunity(null);
+  };
+
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'prospecting': return 'default';
+      case 'prospecting': return 'primary';
       case 'qualification': return 'info';
       case 'proposal': return 'warning';
       case 'negotiation': return 'primary';
       case 'closed_won': return 'success';
       case 'closed_lost': return 'error';
-      default: return 'default';
+      default: return 'primary';
     }
   };
 
@@ -159,10 +169,10 @@ const Sales: React.FC = () => {
                 </Avatar>
                 <Box>
                   <Typography variant="h6">
-                    {metrics?.activeOpportunities || 0}
+                    {metrics?.totalOpportunities || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Opportunities
+                    Total Opportunities
                   </Typography>
                 </Box>
               </Box>
@@ -218,7 +228,13 @@ const Sales: React.FC = () => {
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
-          <SalesPipeline opportunities={opportunities} onEdit={handleEdit} />
+          <SalesPipeline 
+            opportunities={opportunities} 
+            onEdit={handleEdit}
+            onDelete={(id) => console.log('Delete opportunity:', id)}
+            onView={(opportunity) => console.log('View opportunity:', opportunity)}
+            onMoveStage={(id, newStage) => console.log('Move stage:', id, newStage)}
+          />
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
@@ -337,6 +353,7 @@ const Sales: React.FC = () => {
           setOpenForm(false);
           setSelectedOpportunity(null);
         }}
+        onSubmit={handleSubmitOpportunity}
       />
     </Box>
   );

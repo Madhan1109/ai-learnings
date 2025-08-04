@@ -1,49 +1,63 @@
 // User Types
 export interface User {
-  id: string;
+  id: number;
+  username: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  role: 'admin' | 'manager' | 'sales' | 'user';
-  avatar?: string;
+  phoneNumber?: string;
+  isActive: boolean;
+  isLocked: boolean;
+  roles: string[];
+  lastLogin?: string;
   createdAt: string;
-  lastLogin: string;
+  updatedAt: string;
 }
 
 // Customer Types
 export interface Customer {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
   company: string;
-  status: 'active' | 'inactive' | 'lead';
+  industry?: string;
+  status: string;
+  leadScore: number;
   source: string;
-  address?: string;
-  notes?: string;
+  assignedTo?: number;
   createdAt: string;
-  lastContact: string;
-  assignedTo?: string;
-  tags?: string[];
+  updatedAt: string;
 }
 
 // Sales Types
 export interface Opportunity {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  customerId: string;
+  customerId: number;
   customerName: string;
-  stage: 'prospecting' | 'qualification' | 'proposal' | 'negotiation' | 'closed_won' | 'closed_lost';
+  stage: string;
   value: number;
   probability: number;
   expectedCloseDate: string;
-  assignedTo: string;
+  assignedTo: number;
   createdAt: string;
   updatedAt: string;
   notes?: string;
+}
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  assignedTo: number;
+  dueDate: string;
+  priority: string;
+  status: string;
+  opportunityId?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SalesMetrics {
@@ -109,16 +123,32 @@ export interface Prediction {
   createdAt: string;
 }
 
+export interface AnalyticsReport {
+  id: number;
+  reportType: string;
+  title: string;
+  content: string;
+  confidence: number;
+  aiGenerated: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Notification Types
 export interface Notification {
-  id: string;
+  id: number;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
-  category: string;
+  type: string;
+  priority: string;
+  recipientId: number;
   read: boolean;
+  sent: boolean;
+  actionUrl?: string;
+  actionText?: string;
+  metadata?: string;
   createdAt: string;
-  userId: string;
+  updatedAt: string;
 }
 
 // UI Types
@@ -151,7 +181,7 @@ export interface PaginatedResponse<T> {
 
 // Form Types
 export interface LoginForm {
-  email: string;
+  username: string;
   password: string;
   rememberMe: boolean;
 }
@@ -160,9 +190,11 @@ export interface RegisterForm {
   firstName: string;
   lastName: string;
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
   company: string;
+  phone?: string;
 }
 
 // Filter Types

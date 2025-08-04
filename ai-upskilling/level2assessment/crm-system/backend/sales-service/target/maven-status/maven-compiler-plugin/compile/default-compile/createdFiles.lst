@@ -1,0 +1,10 @@
+com\crm\salesservice\config\RedisConfig.class
+com\crm\salesservice\repository\TaskRepository.class
+com\crm\salesservice\controller\SalesController.class
+com\crm\salesservice\service\SalesAIService.class
+com\crm\salesservice\entity\Opportunity.class
+com\crm\salesservice\repository\OpportunityRepository.class
+com\crm\salesservice\service\SalesService.class
+com\crm\salesservice\config\SecurityConfig.class
+com\crm\salesservice\entity\Task.class
+com\crm\salesservice\SalesServiceApplication.class

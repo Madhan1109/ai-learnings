@@ -70,6 +70,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Service Discovery
   eureka:
@@ -81,6 +87,12 @@ services:
       - "8761:8761"
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Customer Service
   customer-service:
@@ -99,6 +111,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Sales Service
   sales-service:
@@ -117,6 +135,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Analytics Service
   analytics-service:
@@ -135,6 +159,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Auth Service
   auth-service:
@@ -153,6 +183,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Notification Service
   notification-service:
@@ -169,6 +205,12 @@ services:
       - eureka
     networks:
       - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Frontend
   frontend:

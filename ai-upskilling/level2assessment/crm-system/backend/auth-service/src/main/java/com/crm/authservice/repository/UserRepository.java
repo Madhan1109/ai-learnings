@@ -21,8 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByIsActiveAndIsLocked(Boolean isActive, Boolean isLocked);
 
     // Role-based queries
-    List<User> findByRolesContaining(String role);
-    List<User> findByRolesIn(List<String> roles);
+    List<User> findByRole(String role);
+    List<User> findByRoleIn(List<String> roles);
 
     // Time-based queries
     List<User> findByCreatedAtAfter(LocalDateTime since);
@@ -47,7 +47,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.failedLoginAttempts > 0")
     Long countByFailedLoginAttemptsGreaterThanZero();
 
-    @Query("SELECT u.roles, COUNT(u) FROM User u GROUP BY u.roles")
+    @Query("SELECT u.role, COUNT(u) FROM User u GROUP BY u.role")
     List<Object[]> getUserCountByRole();
 
     @Query("SELECT DATE(u.createdAt), COUNT(u) FROM User u WHERE u.createdAt >= :startDate GROUP BY DATE(u.createdAt) ORDER BY DATE(u.createdAt)")
@@ -63,7 +63,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.twoFactorEnabled = true")
     Long countByTwoFactorEnabledTrue();
 
-    @Query("SELECT u.roles, AVG(u.failedLoginAttempts) FROM User u GROUP BY u.roles")
+    @Query("SELECT u.role, AVG(u.failedLoginAttempts) FROM User u GROUP BY u.role")
     List<Object[]> getAverageFailedAttemptsByRole();
 
     // Security analytics
@@ -81,10 +81,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersWithHighFailedAttempts();
 
     // Role management queries
-    @Query("SELECT DISTINCT u.roles FROM User u")
+    @Query("SELECT DISTINCT u.role FROM User u")
     List<String> findAllRoles();
 
-    @Query("SELECT u FROM User u WHERE u.roles LIKE %:role%")
+    @Query("SELECT u FROM User u WHERE u.role LIKE %:role%")
     List<User> findByRoleContaining(@Param("role") String role);
 
     // User status queries

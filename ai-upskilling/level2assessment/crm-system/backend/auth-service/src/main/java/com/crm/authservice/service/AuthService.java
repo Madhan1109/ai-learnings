@@ -2,6 +2,8 @@ package com.crm.authservice.service;
 
 import com.crm.authservice.entity.User;
 import com.crm.authservice.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     @Autowired
     private UserRepository userRepository;
 
@@ -33,46 +37,74 @@ public class AuthService {
     // ========== AUTHENTICATION ==========
 
     public Map<String, Object> authenticate(String username, String password) {
+        logger.info("=== AUTHENTICATION START ===");
+        logger.info("Login attempt for username: {}", username);
+        
         Map<String, Object> response = new HashMap<>();
         
+        // Step 1: Find user by username
+        logger.info("Step 1: Looking up user in database...");
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
+            logger.warn("User not found: {}", username);
             response.put("success", false);
             response.put("message", "Invalid credentials");
             return response;
         }
 
         User user = userOpt.get();
+        logger.info("User found: ID={}, Username={}, Email={}", user.getId(), user.getUsername(), user.getEmail());
+        logger.info("Stored password hash: {}", user.getPassword());
         
-        // Check if account is locked
+        // Step 2: Check if account is locked
+        logger.info("Step 2: Checking if account is locked...");
         if (user.getIsLocked()) {
+            logger.warn("Account is locked for user: {}", username);
             response.put("success", false);
             response.put("message", "Account is locked");
             return response;
         }
+        logger.info("Account is not locked");
 
-        // Check if account is active
+        // Step 3: Check if account is active
+        logger.info("Step 3: Checking if account is active...");
         if (!user.getIsActive()) {
+            logger.warn("Account is deactivated for user: {}", username);
             response.put("success", false);
             response.put("message", "Account is deactivated");
             return response;
         }
+        logger.info("Account is active");
 
-        // Check if account is expired
+        // Step 4: Check if account is expired
+        logger.info("Step 4: Checking if account is expired...");
         if (!user.isAccountNonExpired()) {
+            logger.warn("Account has expired for user: {}", username);
             response.put("success", false);
             response.put("message", "Account has expired");
             return response;
         }
+        logger.info("Account is not expired");
 
-        // Verify password
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        // Step 5: Verify password
+        logger.info("Step 5: Verifying password...");
+        logger.info("Input password: {}", password);
+        logger.info("Stored hash: {}", user.getPassword());
+        
+        boolean passwordMatches = passwordEncoder.matches(password, user.getPassword());
+        logger.info("Password match result: {}", passwordMatches);
+        
+        if (!passwordMatches) {
+            logger.warn("Password verification failed for user: {}", username);
             // Increment failed login attempts
-            user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+            int currentAttempts = user.getFailedLoginAttempts();
+            user.setFailedLoginAttempts(currentAttempts + 1);
+            logger.info("Failed login attempts: {} -> {}", currentAttempts, user.getFailedLoginAttempts());
             
             // Lock account after 5 failed attempts
             if (user.getFailedLoginAttempts() >= 5) {
                 user.setIsLocked(true);
+                logger.warn("Account locked due to too many failed attempts: {}", username);
             }
             
             userRepository.save(user);
@@ -82,23 +114,32 @@ public class AuthService {
             return response;
         }
 
-        // Reset failed login attempts on successful login
+        logger.info("Password verification successful!");
+        
+        // Step 6: Success - Reset failed attempts and generate tokens
+        logger.info("Step 6: Processing successful login...");
         user.setFailedLoginAttempts(0);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
+        logger.info("User login time updated and failed attempts reset");
 
         // Generate tokens
+        logger.info("Generating JWT tokens...");
         String accessToken = jwtService.generateToken(user.getUsername(), user.getRoles());
         String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+        logger.info("Tokens generated successfully");
 
         // Store refresh token in Redis
+        logger.info("Storing refresh token in Redis...");
         redisTemplate.opsForValue().set("refresh_token:" + user.getUsername(), refreshToken);
+        logger.info("Refresh token stored in Redis");
 
         response.put("success", true);
         response.put("accessToken", accessToken);
         response.put("refreshToken", refreshToken);
         response.put("user", createUserResponse(user));
         
+        logger.info("=== AUTHENTICATION SUCCESS ===");
         return response;
     }
 
@@ -254,7 +295,7 @@ public class AuthService {
     }
 
     public List<User> getUsersByRole(String role) {
-        return userRepository.findByRolesContaining(role);
+        return userRepository.findByRole(role);
     }
 
     // ========== SECURITY FEATURES ==========

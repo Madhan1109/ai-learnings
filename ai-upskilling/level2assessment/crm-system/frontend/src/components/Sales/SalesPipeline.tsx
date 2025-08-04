@@ -22,20 +22,19 @@ import {
 } from '@mui/icons-material';
 
 interface Opportunity {
-  id: string;
+  id: number;
   title: string;
-  amount: number;
+  value: number;
   stage: string;
   probability: number;
   expectedCloseDate: string;
-  customerName: string;
-  customerCompany: string;
+  customerId: number;
 }
 
 interface SalesPipelineProps {
   opportunities: Opportunity[];
   onEdit: (opportunity: Opportunity) => void;
-  onDelete: (opportunityId: string) => void;
+  onDelete: (opportunityId: number) => void;
   onView: (opportunity: Opportunity) => void;
   onMoveStage: (opportunityId: string, newStage: string) => void;
 }
@@ -48,7 +47,7 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
   onMoveStage,
 }) => {
   const stages = [
-    { key: 'prospecting', label: 'Prospecting', color: 'default' },
+    { key: 'prospecting', label: 'Prospecting', color: 'primary' },
     { key: 'qualification', label: 'Qualification', color: 'info' },
     { key: 'proposal', label: 'Proposal', color: 'warning' },
     { key: 'negotiation', label: 'Negotiation', color: 'secondary' },
@@ -72,7 +71,7 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
 
   const getStageColor = (stage: string) => {
     const stageConfig = stages.find(s => s.key === stage);
-    return stageConfig?.color || 'default';
+    return stageConfig?.color || 'primary';
   };
 
   const getOpportunitiesByStage = (stage: string) => {
@@ -80,7 +79,7 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
   };
 
   const getStageTotal = (stage: string) => {
-    return getOpportunitiesByStage(stage).reduce((sum, opp) => sum + opp.amount, 0);
+    return getOpportunitiesByStage(stage).reduce((sum, opp) => sum + opp.value, 0);
   };
 
   return (
@@ -143,14 +142,10 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                               {opportunity.title}
                             </Typography>
                             
-                            <Typography variant="caption" color="text.secondary" display="block">
-                              {opportunity.customerName} - {opportunity.customerCompany}
-                            </Typography>
-                            
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                               <AttachMoney fontSize="small" color="success" />
                               <Typography variant="caption" color="success.main" sx={{ fontWeight: 'bold' }}>
-                                {formatCurrency(opportunity.amount)}
+                                {formatCurrency(opportunity.value)}
                               </Typography>
                             </Box>
                             

@@ -27,6 +27,8 @@ public class GatewayConfig {
                                         .setKeyResolver(userKeyResolver())))
                         .uri("lb://customer-service"))
                 
+
+                
                 // Sales Service Routes
                 .route("sales-service", r -> r
                         .path("/api/sales/**")
@@ -73,11 +75,10 @@ public class GatewayConfig {
                                 .rewritePath("/api/auth/(?<segment>.*)", "/api/auth/${segment}")
                                 .circuitBreaker(config -> config
                                         .setName("auth-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/auth-service"))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver())))
+                                        .setFallbackUri("forward:/fallback/auth-service")))
                         .uri("lb://auth-service"))
+                
+
                 
                 // WebSocket Routes
                 .route("websocket-route", r -> r

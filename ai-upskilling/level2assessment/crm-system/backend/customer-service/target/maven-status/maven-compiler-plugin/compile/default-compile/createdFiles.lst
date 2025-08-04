@@ -1,0 +1,11 @@
+com\crm\customerservice\service\AIService.class
+com\crm\customerservice\config\SwaggerConfig.class
+com\crm\customerservice\repository\CustomerRepository.class
+com\crm\customerservice\config\MonitoringConfig.class
+com\crm\customerservice\controller\CustomerController.class
+com\crm\customerservice\CustomerServiceApplication.class
+com\crm\customerservice\service\CustomerService.class
+com\crm\customerservice\config\JwtAuthenticationFilter.class
+com\crm\customerservice\config\RedisConfig.class
+com\crm\customerservice\entity\Customer.class
+com\crm\customerservice\config\SecurityConfig.class

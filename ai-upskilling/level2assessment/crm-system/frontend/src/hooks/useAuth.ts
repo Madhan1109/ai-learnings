@@ -1,88 +1,72 @@
-import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { RootState } from '../store';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../store';
 import { login, logout, register, getCurrentUser } from '../store/slices/authSlice';
 import { authAPI } from '../services/api';
 import { storage } from '../utils';
 
 export const useAuth = () => {
-  const dispatch = useDispatch();
-  const { user, isAuthenticated, loading, error } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated, loading, error } = useSelector((state: RootState) => state.auth);
 
   const loginUser = useCallback(
-    async (credentials: { email: string; password: string }) => {
+    async (credentials: { username: string; password: string }) => {
       try {
         const response = await authAPI.login(credentials);
         const { token, user } = response.data;
-        
+
         // Store token in localStorage
         storage.set('token', token);
         storage.set('user', user);
-        
+
         // Update Redux state
-        dispatch(login({ user, token }));
-        
+        dispatch(login(credentials));
+
         return { success: true };
       } catch (error: any) {
-        return { 
-          success: false, 
-          error: error.response?.data?.message || 'Login failed' 
-        };
+        return { success: false, error: error.message };
       }
     },
     [dispatch]
   );
 
   const registerUser = useCallback(
-    async (userData: any) => {
+    async (userData: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      email: string;
+      password: string;
+      company: string;
+      phone?: string;
+    }) => {
       try {
         const response = await authAPI.register(userData);
-        const { token, user } = response.data;
-        
-        // Store token in localStorage
-        storage.set('token', token);
-        storage.set('user', user);
-        
-        // Update Redux state
-        dispatch(register({ user, token }));
-        
-        return { success: true };
+        return { success: true, data: response.data };
       } catch (error: any) {
-        return { 
-          success: false, 
-          error: error.response?.data?.message || 'Registration failed' 
-        };
+        return { success: false, error: error.message };
       }
     },
-    [dispatch]
+    []
   );
 
-  const logoutUser = useCallback(async () => {
-    try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      // Clear localStorage
-      storage.remove('token');
-      storage.remove('user');
-      
-      // Update Redux state
-      dispatch(logout());
-    }
+  const logoutUser = useCallback(() => {
+    // Clear localStorage
+    storage.remove('token');
+    storage.remove('user');
+
+    // Update Redux state
+    dispatch(logout());
   }, [dispatch]);
 
   const checkAuth = useCallback(async () => {
     const token = storage.get('token');
-    const storedUser = storage.get('user');
-    
-    if (token && storedUser) {
+    if (token && !isAuthenticated) {
       try {
         // Verify token with backend
         const response = await authAPI.getCurrentUser();
-        dispatch(login({ user: response.data, token }));
+        // Don't dispatch login here, just update the user state
+        dispatch(getCurrentUser());
       } catch (error) {
         // Token is invalid, clear everything
         storage.remove('token');
@@ -90,7 +74,7 @@ export const useAuth = () => {
         dispatch(logout());
       }
     }
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
 
   const refreshUser = useCallback(async () => {
     if (isAuthenticated) {

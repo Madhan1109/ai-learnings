@@ -74,15 +74,15 @@ export const apiService = {
 
 // Auth API
 export const authAPI = {
-  login: (credentials: { email: string; password: string }) =>
+  login: (credentials: { username: string; password: string }) =>
     apiService.post<{ token: string; user: any }>('/auth/login', credentials),
 
   register: (userData: any) =>
-    apiService.post<{ token: string; user: any }>('/auth/register', userData),
+    apiService.post<{ token: string; user: any }>('/auth/users', userData),
 
   logout: () => apiService.post('/auth/logout'),
 
-  getCurrentUser: () => apiService.get<any>('/auth/me'),
+  getCurrentUser: () => apiService.get<any>('/auth/profile/1'),
 
   refreshToken: () => apiService.post<{ token: string }>('/auth/refresh'),
 };
@@ -121,9 +121,32 @@ export const salesAPI = {
   deleteOpportunity: (id: string) =>
     apiService.delete(`/sales/opportunities/${id}`),
 
-  getSalesMetrics: () => apiService.get<any>('/sales/metrics'),
+  getSalesMetrics: () => apiService.get<any>('/sales/analytics/pipeline'),
 
-  getPipeline: () => apiService.get<any>('/sales/pipeline'),
+  getPipeline: () => apiService.get<any>('/sales/analytics/pipeline-summary'),
+
+  // AI-powered features
+  getHighValueOpportunities: (minScore?: number) =>
+    apiService.get<any>(`/sales/opportunities/ai/high-value?minScore=${minScore || 70}`),
+
+  getHighWinProbabilityOpportunities: (minProbability?: number) =>
+    apiService.get<any>(`/sales/opportunities/ai/high-win-probability?minProbability=${minProbability || 0.6}`),
+
+  getNextBestAction: (opportunityId: string) =>
+    apiService.get<any>(`/sales/opportunities/ai/next-best-action/${opportunityId}`),
+
+  // Tasks
+  getTasks: () => apiService.get<any>('/sales/tasks'),
+
+  createTask: (task: any) => apiService.post<any>('/sales/tasks', task),
+
+  updateTask: (id: string, task: any) => apiService.put<any>(`/sales/tasks/${id}`, task),
+
+  deleteTask: (id: string) => apiService.delete(`/sales/tasks/${id}`),
+
+  getOverdueTasks: () => apiService.get<any>('/sales/tasks/overdue'),
+
+  getTasksDueToday: () => apiService.get<any>('/sales/tasks/due-today'),
 };
 
 // Analytics API
@@ -131,18 +154,39 @@ export const analyticsAPI = {
   getAnalytics: (timeRange: string) =>
     apiService.get<any>(`/analytics?timeRange=${timeRange}`),
 
-  getPredictions: () => apiService.get<any>('/analytics/predictions'),
+  getPredictions: () => apiService.get<any>('/analytics/ai/summary'),
 
   getRevenueChart: (params?: any) =>
-    apiService.get<any>('/analytics/revenue-chart', { params }),
+    apiService.get<any>('/analytics/ai/revenue-forecast', { params }),
 
   getCustomerChart: (params?: any) =>
-    apiService.get<any>('/analytics/customer-chart', { params }),
+    apiService.get<any>('/analytics/ai/customer-segmentation', { params }),
 
   getSalesChart: (params?: any) =>
-    apiService.get<any>('/analytics/sales-chart', { params }),
+    apiService.get<any>('/analytics/ai/sales-trends', { params }),
 
-  getAIInsights: () => apiService.get<any>('/analytics/insights'),
+  getAIInsights: () => apiService.get<any>('/analytics/ai/insights/sales'),
+
+  // Dashboard endpoints
+  getDashboardOverview: () => apiService.get<any>('/analytics/dashboard/overview'),
+
+  getDashboardTrends: () => apiService.get<any>('/analytics/dashboard/trends'),
+
+  // AI Insights
+  getSalesInsights: () => apiService.get<any>('/analytics/ai/insights/sales'),
+
+  getCustomerInsights: () => apiService.get<any>('/analytics/ai/insights/customers'),
+
+  getMarketInsights: () => apiService.get<any>('/analytics/ai/insights/market'),
+
+  // Reports
+  getReports: () => apiService.get<any>('/analytics/reports'),
+
+  createReport: (report: any) => apiService.post<any>('/analytics/reports', report),
+
+  updateReport: (id: string, report: any) => apiService.put<any>(`/analytics/reports/${id}`, report),
+
+  deleteReport: (id: string) => apiService.delete(`/analytics/reports/${id}`),
 };
 
 // Notifications API
@@ -150,33 +194,63 @@ export const notificationAPI = {
   getNotifications: (params?: any) =>
     apiService.get<PaginatedResponse<any>>('/notifications', { params }),
 
+  getNotification: (id: string) => apiService.get<any>(`/notifications/${id}`),
+
+  createNotification: (notification: any) => apiService.post<any>('/notifications', notification),
+
+  updateNotification: (id: string, notification: any) =>
+    apiService.put<any>(`/notifications/${id}`, notification),
+
+  deleteNotification: (id: string) => apiService.delete(`/notifications/${id}`),
+
   markAsRead: (id: string) =>
-    apiService.patch<any>(`/notifications/${id}/read`),
+    apiService.post<any>(`/notifications/${id}/read`),
 
-  markAllAsRead: () => apiService.patch<any>('/notifications/read-all'),
+  markAllAsRead: (recipientId: string) => 
+    apiService.post<any>(`/notifications/recipient/${recipientId}/read-all`),
 
-  deleteNotification: (id: string) =>
-    apiService.delete(`/notifications/${id}`),
+  getUnreadCount: () => apiService.get<{ count: number }>('/notifications/summary'),
 
-  getUnreadCount: () => apiService.get<{ count: number }>('/notifications/unread-count'),
+  // Notification types
+  createSystemNotification: (data: any) => apiService.post<any>('/notifications/system', data),
+
+  createAlertNotification: (data: any) => apiService.post<any>('/notifications/alert', data),
+
+  createUrgentNotification: (data: any) => apiService.post<any>('/notifications/urgent', data),
+
+  createTaskNotification: (data: any) => apiService.post<any>('/notifications/task', data),
+
+  createSalesNotification: (data: any) => apiService.post<any>('/notifications/sales', data),
+
+  // Bulk operations
+  sendBulkNotification: (data: any) => apiService.post<any>('/notifications/bulk', data),
+
+  broadcastNotification: (notification: any) => apiService.post<any>('/notifications/broadcast', notification),
+
+  // Search and filter
+  searchNotifications: (keyword: string) => apiService.get<any>(`/notifications/search?keyword=${keyword}`),
+
+  getNotificationsByType: (type: string) => apiService.get<any>(`/notifications/type/${type}`),
+
+  getNotificationsByPriority: (priority: string) => apiService.get<any>(`/notifications/priority/${priority}`),
 };
 
 // Settings API
 export const settingsAPI = {
-  getUserSettings: () => apiService.get<any>('/settings'),
+  getUserSettings: () => apiService.get<any>('/auth/profile/1'),
 
   updateUserSettings: (settings: any) =>
-    apiService.put<any>('/settings', settings),
+    apiService.put<any>('/auth/profile/1', settings),
 
   updateProfile: (profile: any) =>
-    apiService.put<any>('/settings/profile', profile),
+    apiService.put<any>('/auth/profile/1', profile),
 
   changePassword: (passwordData: any) =>
-    apiService.put<any>('/settings/password', passwordData),
+    apiService.post<any>('/auth/users/1/change-password', passwordData),
 
-  exportData: () => apiService.get<any>('/settings/export'),
+  exportData: () => apiService.get<any>('/analytics/reports/export/1'),
 
-  importData: (data: any) => apiService.post<any>('/settings/import', data),
+  importData: (data: any) => apiService.post<any>('/analytics/reports/bulk', data),
 };
 
 // File Upload API

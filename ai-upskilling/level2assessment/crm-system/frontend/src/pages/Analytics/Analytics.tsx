@@ -23,7 +23,7 @@ import {
 import {
   TrendingUp,
   TrendingDown,
-  Analytics,
+  Analytics as AnalyticsIcon,
   Psychology,
   Timeline,
   FilterList,
@@ -33,13 +33,13 @@ import {
   Warning,
   CheckCircle,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
 import { fetchAnalytics, fetchPredictions } from '../../store/slices/analyticsSlice';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import RevenueChart from '../../components/Analytics/RevenueChart';
-import CustomerChart from '../../components/Analytics/CustomerChart';
-import SalesChart from '../../components/Analytics/SalesChart';
+import CustomerChart from '../../components/Charts/CustomerChart';
+import SalesChart from '../../components/Charts/SalesChart';
 import AIInsights from '../../components/Analytics/AIInsights';
 import PredictiveAnalytics from '../../components/Analytics/PredictiveAnalytics';
 
@@ -65,8 +65,8 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const Analytics: React.FC = () => {
-  const dispatch = useDispatch();
+const AnalyticsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { analytics, predictions, loading } = useSelector((state: RootState) => state.analytics);
   
   const [tabValue, setTabValue] = useState(0);
@@ -155,7 +155,7 @@ const Analytics: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Avatar sx={{ bgcolor: 'success.main' }}>
-                  <Analytics />
+                  <AnalyticsIcon />
                 </Avatar>
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography variant="h6">
@@ -289,4 +289,4 @@ const Analytics: React.FC = () => {
   );
 };
 
-export default Analytics; 
+export default AnalyticsPage; 

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Box, CssBaseline } from '@mui/material';
-import { RootState } from './store';
+import { RootState, useAppDispatch } from './store';
 import { getCurrentUser } from './store/slices/authSlice';
 import Layout from './components/Layout/Layout';
 import Login from './pages/Auth/Login';
@@ -17,7 +17,7 @@ import Snackbar from './components/UI/Snackbar';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 
 const App: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
   const { snackbar } = useSelector((state: RootState) => state.ui);
 

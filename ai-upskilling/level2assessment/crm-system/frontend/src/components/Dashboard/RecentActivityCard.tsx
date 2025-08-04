@@ -1,141 +1,129 @@
 import React from 'react';
 import {
+  Box,
   Card,
   CardContent,
-  CardHeader,
   Typography,
-  Box,
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar,
-  Avatar,
+  ListItemIcon,
   Chip,
-  IconButton,
+  Avatar,
+  useTheme,
 } from '@mui/material';
 import {
-  Timeline,
-  Person,
-  AttachMoney,
   Email,
   Phone,
-  Meeting,
+  Event,
   Assignment,
   CheckCircle,
   Schedule,
+  Person,
 } from '@mui/icons-material';
+import { format } from 'date-fns';
 
 interface Activity {
   id: string;
-  type: 'customer' | 'opportunity' | 'email' | 'call' | 'meeting' | 'task';
+  type: 'email' | 'call' | 'meeting' | 'task' | 'opportunity';
   title: string;
   description: string;
   timestamp: string;
-  status: 'completed' | 'pending' | 'in-progress';
-  user: string;
+  user: {
+    name: string;
+    avatar?: string;
+  };
+  status?: 'completed' | 'pending' | 'overdue';
 }
 
 interface RecentActivityCardProps {
-  activities: Activity[];
+  activities?: Activity[];
 }
 
-const RecentActivityCard: React.FC<RecentActivityCardProps> = ({ activities }) => {
-  const getActivityIcon = (type: string) => {
+const RecentActivityCard: React.FC<RecentActivityCardProps> = ({ activities = [] }) => {
+  const theme = useTheme();
+
+  const getActivityIcon = (type: Activity['type']) => {
     switch (type) {
-      case 'customer': return <Person />;
-      case 'opportunity': return <AttachMoney />;
-      case 'email': return <Email />;
-      case 'call': return <Phone />;
-      case 'meeting': return <Meeting />;
-      case 'task': return <Assignment />;
-      default: return <Timeline />;
+      case 'email':
+        return <Email color="primary" />;
+      case 'call':
+        return <Phone color="success" />;
+      case 'meeting':
+        return <Event color="warning" />;
+      case 'task':
+        return <Assignment color="info" />;
+      case 'opportunity':
+        return <CheckCircle color="secondary" />;
+      default:
+        return <Schedule color="action" />;
     }
   };
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'customer': return 'primary';
-      case 'opportunity': return 'success';
-      case 'email': return 'info';
-      case 'call': return 'warning';
-      case 'meeting': return 'secondary';
-      case 'task': return 'default';
-      default: return 'default';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status?: Activity['status']) => {
     switch (status) {
-      case 'completed': return 'success';
-      case 'pending': return 'warning';
-      case 'in-progress': return 'info';
-      default: return 'default';
+      case 'completed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'overdue':
+        return 'error';
+      default:
+        return 'default';
     }
-  };
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
-    return date.toLocaleDateString();
   };
 
   return (
     <Card sx={{ height: '100%' }}>
-      <CardHeader
-        title="Recent Activity"
-        avatar={<Timeline color="primary" />}
-        action={
-          <IconButton size="small">
-            <Schedule />
-          </IconButton>
-        }
-      />
-      <CardContent sx={{ p: 0 }}>
-        <List dense>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Recent Activity
+        </Typography>
+        <List sx={{ p: 0 }}>
           {activities.map((activity) => (
-            <ListItem key={activity.id} sx={{ px: 2, py: 1 }}>
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    bgcolor: `${getActivityColor(activity.type)}.light`,
-                    color: `${getActivityColor(activity.type)}.main`,
-                    width: 32,
-                    height: 32,
-                  }}
-                >
-                  {getActivityIcon(activity.type)}
-                </Avatar>
-              </ListItemAvatar>
+            <ListItem
+              key={activity.id}
+              sx={{
+                px: 0,
+                py: 1,
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                '&:last-child': {
+                  borderBottom: 'none',
+                },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                {getActivityIcon(activity.type)}
+              </ListItemIcon>
               <ListItemText
                 primary={
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" fontWeight="medium">
                       {activity.title}
                     </Typography>
-                    <Chip
-                      label={activity.status}
-                      size="small"
-                      color={getStatusColor(activity.status) as any}
-                      variant="outlined"
-                    />
+                    {activity.status && (
+                      <Chip
+                        label={activity.status}
+                        size="small"
+                        color={getStatusColor(activity.status) as any}
+                      />
+                    )}
                   </Box>
                 }
                 secondary={
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary">
                       {activity.description}
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                      <Avatar
+                        sx={{ width: 20, height: 20, fontSize: '0.75rem' }}
+                        src={activity.user.avatar}
+                      >
+                        {activity.user.name.charAt(0)}
+                      </Avatar>
                       <Typography variant="caption" color="text.secondary">
-                        {activity.user}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {formatTimestamp(activity.timestamp)}
+                        {activity.user.name} • {format(new Date(activity.timestamp), 'MMM d, h:mm a')}
                       </Typography>
                     </Box>
                   </Box>

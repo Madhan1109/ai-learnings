@@ -1,118 +1,20 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-} from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-interface SalesData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    borderColor?: string;
-    backgroundColor?: string;
-    tension?: number;
-  }[];
-}
+import { Card, CardContent, Typography } from '@mui/material';
 
 interface SalesChartProps {
-  data: SalesData;
-  type?: 'line' | 'bar';
-  title?: string;
-  period?: string;
-  onPeriodChange?: (period: string) => void;
+  data?: any;
 }
 
-const SalesChart: React.FC<SalesChartProps> = ({
-  data,
-  type = 'line',
-  title = 'Sales Performance',
-  period = '30d',
-  onPeriodChange,
-}) => {
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: function(value: any) {
-            return '$' + value.toLocaleString();
-          },
-        },
-      },
-    },
-  };
-
+const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
   return (
-    <Card sx={{ height: '100%' }}>
-      <CardHeader
-        title={title}
-        action={
-          onPeriodChange && (
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Period</InputLabel>
-              <Select
-                value={period}
-                label="Period"
-                onChange={(e) => onPeriodChange(e.target.value)}
-              >
-                <MenuItem value="7d">Last 7 days</MenuItem>
-                <MenuItem value="30d">Last 30 days</MenuItem>
-                <MenuItem value="90d">Last 90 days</MenuItem>
-                <MenuItem value="1y">Last year</MenuItem>
-              </Select>
-            </FormControl>
-          )
-        }
-      />
+    <Card>
       <CardContent>
-        <Box sx={{ height: 300 }}>
-          {type === 'line' ? (
-            <Line data={data} options={options} />
-          ) : (
-            <Bar data={data} options={options} />
-          )}
-        </Box>
+        <Typography variant="h6" gutterBottom>
+          Sales Chart
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Sales chart component placeholder
+        </Typography>
       </CardContent>
     </Card>
   );

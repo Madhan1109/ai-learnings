@@ -41,27 +41,17 @@ import {
   Phone,
   Business,
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { fetchCustomers, deleteCustomer } from '../../store/slices/customerSlice';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
+import { fetchCustomers, deleteCustomer, createCustomer, updateCustomer } from '../../store/slices/customerSlice';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import CustomerForm from '../../components/Customers/CustomerForm';
 import CustomerDetails from '../../components/Customers/CustomerDetails';
 
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  status: 'active' | 'inactive' | 'lead';
-  source: string;
-  createdAt: string;
-  lastContact: string;
-}
+import { Customer } from '../../store/slices/customerSlice';
 
 const Customers: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { customers, loading } = useSelector((state: RootState) => state.customers);
   
   const [page, setPage] = useState(0);
@@ -74,7 +64,7 @@ const Customers: React.FC = () => {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
-    dispatch(fetchCustomers());
+    dispatch(fetchCustomers({ page: 1, limit: 10 }));
   }, [dispatch]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,10 +95,21 @@ const Customers: React.FC = () => {
     setOpenDetails(true);
   };
 
-  const handleDelete = (customerId: string) => {
+  const handleDelete = (customerId: number) => {
     if (window.confirm('Are you sure you want to delete this customer?')) {
       dispatch(deleteCustomer(customerId));
     }
+  };
+
+  const handleSubmitCustomer = (customer: any) => {
+    if (customer.id) {
+      const { id, ...data } = customer;
+      dispatch(updateCustomer({ id, data }));
+    } else {
+      dispatch(createCustomer(customer));
+    }
+    setOpenForm(false);
+    setEditingCustomer(null);
   };
 
   const getStatusColor = (status: string) => {
@@ -234,7 +235,7 @@ const Customers: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(customer.lastContact).toLocaleDateString()}
+                        {new Date(customer.createdAt).toLocaleDateString()}
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
@@ -275,6 +276,7 @@ const Customers: React.FC = () => {
           setOpenForm(false);
           setEditingCustomer(null);
         }}
+        onSubmit={handleSubmitCustomer}
       />
 
       {/* Customer Details Dialog */}
@@ -285,6 +287,8 @@ const Customers: React.FC = () => {
           setOpenDetails(false);
           setSelectedCustomer(null);
         }}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     </Box>
   );

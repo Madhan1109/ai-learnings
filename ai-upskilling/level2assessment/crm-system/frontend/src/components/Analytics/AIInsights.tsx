@@ -43,7 +43,7 @@ interface AIInsightsProps {
   onRefresh?: () => void;
 }
 
-const AIInsights: React.FC<AIInsightsProps> = ({ insights, onRefresh }) => {
+const AIInsights: React.FC<AIInsightsProps> = ({ insights = [], onRefresh }) => {
   const getInsightIcon = (type: string) => {
     switch (type) {
       case 'opportunity': return <TrendingUp />;

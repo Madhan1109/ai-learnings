@@ -21,7 +21,7 @@ import { AttachMoney, Person, CalendarToday, TrendingUp } from '@mui/icons-mater
 interface Opportunity {
   id?: string;
   title: string;
-  amount: number;
+  value: number;
   stage: 'prospecting' | 'qualification' | 'proposal' | 'negotiation' | 'closed-won' | 'closed-lost';
   probability: number;
   expectedCloseDate: string;
@@ -48,7 +48,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<Opportunity>({
     title: '',
-    amount: 0,
+    value: 0,
     stage: 'prospecting',
     probability: 25,
     expectedCloseDate: '',
@@ -58,7 +58,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
     notes: '',
   });
 
-  const [errors, setErrors] = useState<Partial<Opportunity>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Opportunity, string>>>({});
 
   useEffect(() => {
     if (opportunity) {
@@ -66,7 +66,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
     } else {
       setFormData({
         title: '',
-        amount: 0,
+        value: 0,
         stage: 'prospecting',
         probability: 25,
         expectedCloseDate: '',
@@ -80,20 +80,14 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
   }, [opportunity, open]);
 
   const handleChange = (field: keyof Opportunity) => (
-    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
+    event: React.ChangeEvent<HTMLInputElement> | any
   ) => {
-    const value = event.target.value as string | number;
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    const value = event.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear error when user starts typing
+    // Clear field error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: undefined,
-      }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -106,23 +100,35 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<Opportunity> = {};
+  const validateForm = () => {
+    const newErrors: Partial<Record<keyof Opportunity, string>> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = 'Opportunity name is required';
     }
 
-    if (formData.amount <= 0) {
-      newErrors.amount = 'Amount must be greater than 0';
+    if (!formData.description?.trim()) {
+      newErrors.description = 'Description is required';
+    }
+
+    if (!formData.customerId) {
+      newErrors.customerId = 'Customer is required';
+    }
+
+    if (!formData.stage) {
+      newErrors.stage = 'Stage is required';
+    }
+
+    if (formData.value <= 0) {
+      newErrors.value = 'Value must be greater than 0';
     }
 
     if (!formData.expectedCloseDate) {
       newErrors.expectedCloseDate = 'Expected close date is required';
     }
 
-    if (!formData.customerId) {
-      newErrors.customerId = 'Customer is required';
+    if (formData.probability < 0 || formData.probability > 100) {
+      newErrors.probability = 'Probability must be between 0 and 100';
     }
 
     setErrors(newErrors);
@@ -180,12 +186,12 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Amount"
+              label="Value"
               type="number"
-              value={formData.amount}
-              onChange={handleChange('amount')}
-              error={!!errors.amount}
-              helperText={errors.amount}
+              value={formData.value}
+              onChange={handleChange('value')}
+              error={!!errors.value}
+              helperText={errors.value}
               InputProps={{
                 startAdornment: <AttachMoney color="action" />,
               }}
@@ -220,7 +226,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
                 onChange={handleChange('stage')}
               >
                 <MenuItem value="prospecting">
-                  <Chip label="Prospecting" size="small" color="default" />
+                  <Chip label="Prospecting" size="small" color="primary" />
                 </MenuItem>
                 <MenuItem value="qualification">
                   <Chip label="Qualification" size="small" color="info" />

@@ -70,6 +70,27 @@ export const registerUser = createAsyncThunk(
   async (userData: {
     firstName: string;
     lastName: string;
+    username: string;
+    email: string;
+    password: string;
+    company: string;
+    phone?: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await authService.register(userData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  'auth/register',
+  async (userData: {
+    firstName: string;
+    lastName: string;
+    username: string;
     email: string;
     password: string;
     company: string;

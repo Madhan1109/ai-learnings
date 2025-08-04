@@ -21,6 +21,8 @@ export interface AnalyticsState {
   selectedReport: AnalyticsReport | null;
   loading: boolean;
   error: string | null;
+  analytics: any;
+  predictions: any;
   insights: {
     salesTrends: any;
     customerSegments: any;
@@ -36,6 +38,8 @@ const initialState: AnalyticsState = {
   selectedReport: null,
   loading: false,
   error: null,
+  analytics: null,
+  predictions: null,
   insights: {
     salesTrends: {},
     customerSegments: {},
@@ -58,11 +62,36 @@ export const fetchReports = createAsyncThunk(
   }
 );
 
+export const fetchAnalytics = createAsyncThunk(
+  'analytics/fetchAnalytics',
+  async (timeRange: string = '30d', { rejectWithValue }) => {
+    try {
+      const response = await analyticsService.getAnalytics(timeRange);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch analytics');
+    }
+  }
+);
+
+export const fetchPredictions = createAsyncThunk(
+  'analytics/fetchPredictions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await analyticsService.getPredictions();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch predictions');
+    }
+  }
+);
+
+// These methods are not available in analyticsService, so we'll use available methods instead
 export const analyzeSalesTrends = createAsyncThunk(
   'analytics/analyzeSalesTrends',
   async (salesData: any[], { rejectWithValue }) => {
     try {
-      const response = await analyticsService.analyzeSalesTrends(salesData);
+      const response = await analyticsService.getSalesInsights();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to analyze sales trends');
@@ -74,7 +103,7 @@ export const segmentCustomers = createAsyncThunk(
   'analytics/segmentCustomers',
   async (customerData: any[], { rejectWithValue }) => {
     try {
-      const response = await analyticsService.segmentCustomers(customerData);
+      const response = await analyticsService.getCustomerInsights();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to segment customers');
@@ -86,7 +115,7 @@ export const predictChurn = createAsyncThunk(
   'analytics/predictChurn',
   async (customerData: any, { rejectWithValue }) => {
     try {
-      const response = await analyticsService.predictChurn(customerData);
+      const response = await analyticsService.getPredictions();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to predict churn');
@@ -113,7 +142,7 @@ const analyticsSlice = createSlice({
       })
       .addCase(fetchReports.fulfilled, (state, action) => {
         state.loading = false;
-        state.reports = action.payload;
+        state.reports = action.payload as unknown as AnalyticsReport[];
       })
       .addCase(fetchReports.rejected, (state, action) => {
         state.loading = false;
@@ -127,6 +156,30 @@ const analyticsSlice = createSlice({
       })
       .addCase(predictChurn.fulfilled, (state, action) => {
         state.insights.churnPrediction = action.payload;
+      })
+      .addCase(fetchAnalytics.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAnalytics.fulfilled, (state, action) => {
+        state.loading = false;
+        state.analytics = action.payload;
+      })
+      .addCase(fetchAnalytics.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchPredictions.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPredictions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.predictions = action.payload;
+      })
+      .addCase(fetchPredictions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

@@ -16,24 +16,23 @@ import {
   Chip,
 } from '@mui/material';
 import { Person, Business, Email, Phone, LocationOn } from '@mui/icons-material';
+import { Customer } from '../../store/slices/customerSlice';
 
-interface Customer {
-  id?: string;
+type CustomerFormData = Partial<Customer> & {
   name: string;
   email: string;
   phone: string;
   company: string;
-  status: 'active' | 'inactive' | 'lead';
+  status: string;
+  leadScore: number;
   source: string;
-  address?: string;
-  notes?: string;
-}
+};
 
 interface CustomerFormProps {
   open: boolean;
   customer?: Customer | null;
   onClose: () => void;
-  onSubmit: (customer: Customer) => void;
+  onSubmit: (customer: CustomerFormData) => void;
 }
 
 const CustomerForm: React.FC<CustomerFormProps> = ({
@@ -42,18 +41,17 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [formData, setFormData] = useState<Customer>({
+  const [formData, setFormData] = useState<CustomerFormData>({
     name: '',
     email: '',
     phone: '',
     company: '',
     status: 'lead',
+    leadScore: 0,
     source: '',
-    address: '',
-    notes: '',
   });
 
-  const [errors, setErrors] = useState<Partial<Customer>>({});
+  const [errors, setErrors] = useState<Partial<CustomerFormData>>({});
 
   useEffect(() => {
     if (customer) {
@@ -65,34 +63,27 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
         phone: '',
         company: '',
         status: 'lead',
+        leadScore: 0,
         source: '',
-        address: '',
-        notes: '',
       });
     }
     setErrors({});
   }, [customer, open]);
 
-  const handleChange = (field: keyof Customer) => (
-    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
+  const handleChange = (field: keyof CustomerFormData) => (
+    event: React.ChangeEvent<HTMLInputElement> | any
   ) => {
-    const value = event.target.value as string;
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+    const value = event.target.value;
+    setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear error when user starts typing
+    // Clear field error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: undefined,
-      }));
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Customer> = {};
+    const newErrors: Partial<CustomerFormData> = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
@@ -195,7 +186,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 onChange={handleChange('status')}
               >
                 <MenuItem value="lead">
-                  <Chip label="Lead" size="small" color="default" />
+                  <Chip label="Lead" size="small" color="primary" />
                 </MenuItem>
                 <MenuItem value="active">
                   <Chip label="Active" size="small" color="success" />
@@ -219,26 +210,23 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             />
           </Grid>
           
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Address"
-              multiline
-              rows={2}
-              value={formData.address}
-              onChange={handleChange('address')}
+              label="Industry"
+              value={formData.industry || ''}
+              onChange={handleChange('industry')}
             />
           </Grid>
           
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="Notes"
-              multiline
-              rows={3}
-              value={formData.notes}
-              onChange={handleChange('notes')}
-              placeholder="Add any additional notes about this customer..."
+              label="Lead Score"
+              type="number"
+              value={formData.leadScore}
+              onChange={handleChange('leadScore')}
+              inputProps={{ min: 0, max: 100 }}
             />
           </Grid>
         </Grid>

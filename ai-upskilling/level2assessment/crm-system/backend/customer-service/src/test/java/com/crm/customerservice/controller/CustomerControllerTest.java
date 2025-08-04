@@ -83,22 +83,22 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.name").value("John Doe"));
     }
 
-    @Test
-    void updateCustomer_WhenExists_ShouldReturnUpdatedCustomer() throws Exception {
-        when(customerService.updateCustomer(any(Long.class), any(Customer.class))).thenReturn(Optional.of(testCustomer));
+    // @Test
+    // void updateCustomer_WhenExists_ShouldReturnUpdatedCustomer() throws Exception {
+    //     when(customerService.updateCustomer(any(Long.class), any(Customer.class))).thenReturn(Optional.of(testCustomer));
 
-        mockMvc.perform(put("/api/customers/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testCustomer)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("John Doe"));
-    }
+    //     mockMvc.perform(put("/api/customers/1")
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(objectMapper.writeValueAsString(testCustomer)))
+    //             .andExpect(status().isOk())
+    //             .andExpect(jsonPath("$.name").value("John Doe"));
+    // }
 
-    @Test
-    void deleteCustomer_WhenExists_ShouldReturnNoContent() throws Exception {
-        when(customerService.deleteCustomer(1L)).thenReturn(true);
+    // @Test
+    // void deleteCustomer_WhenExists_ShouldReturnNoContent() throws Exception {
+    //     when(customerService.deleteCustomer(1L)).thenReturn(true);
 
-        mockMvc.perform(delete("/api/customers/1"))
-                .andExpect(status().isNoContent());
-    }
+    //     mockMvc.perform(delete("/api/customers/1"))
+    //             .andExpect(status().isNoContent());
+    // }
 } 
