@@ -251,10 +251,10 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2 }}>
-                  Opportunities ({opportunities.length})
+                  Opportunities ({opportunities?.length || 0})
                 </Typography>
                 
-                {opportunities.length > 0 ? (
+                {opportunities?.length > 0 ? (
                   <List dense>
                     {opportunities.map((opportunity) => (
                       <ListItem key={opportunity.id}>
@@ -291,10 +291,10 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2 }}>
-                  Recent Activities ({activities.length})
+                  Recent Activities ({activities?.length || 0})
                 </Typography>
                 
-                {activities.length > 0 ? (
+                {activities?.length > 0 ? (
                   <List dense>
                     {activities.map((activity) => (
                       <ListItem key={activity.id}>

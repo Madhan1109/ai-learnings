@@ -29,7 +29,7 @@ GET /api/customers
 [
   {
     "id": 1,
-    "name": "John Doe",
+    "name": "Madhan M S",
     "email": "john.doe@example.com",
     "phone": "+1234567890",
     "company": "Acme Corp",
@@ -260,7 +260,7 @@ const customers = await client.customers.getAll();
 
 // Create customer
 const newCustomer = await client.customers.create({
-  name: 'John Doe',
+  name: 'Madhan M S',
   email: 'john@example.com'
 });
 ```
@@ -279,7 +279,7 @@ customers = client.customers.get_all()
 
 # Create customer
 new_customer = client.customers.create({
-    'name': 'John Doe',
+    'name': 'Madhan M S',
     'email': 'john@example.com'
 })
 ``` 

@@ -86,7 +86,7 @@ const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
     return date.toLocaleDateString();
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications?.filter(n => !n.read).length || 0;
 
   return (
     <Drawer
@@ -125,7 +125,7 @@ const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
         
         <Divider sx={{ mb: 2 }} />
         
-        {notifications.length === 0 ? (
+        {notifications?.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Notifications sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
             <Typography variant="body1" color="text.secondary">

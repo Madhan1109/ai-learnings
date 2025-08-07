@@ -19,9 +19,10 @@ public class GatewayConfig {
                         .path("/api/customers/**")
                         .filters(f -> f
                                 .rewritePath("/api/customers/(?<segment>.*)", "/api/customers/${segment}")
-                                .circuitBreaker(config -> config
-                                        .setName("customer-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/customer-service"))
+                                // Temporarily disabled circuit breaker for testing
+                                // .circuitBreaker(config -> config
+                                //         .setName("customer-service-circuit-breaker")
+                                //         .setFallbackUri("forward:/fallback/customer-service"))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver())))
@@ -34,9 +35,10 @@ public class GatewayConfig {
                         .path("/api/sales/**")
                         .filters(f -> f
                                 .rewritePath("/api/sales/(?<segment>.*)", "/api/sales/${segment}")
-                                .circuitBreaker(config -> config
-                                        .setName("sales-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/sales-service"))
+                                // Temporarily disabled circuit breaker for testing
+                                // .circuitBreaker(config -> config
+                                //         .setName("sales-service-circuit-breaker")
+                                //         .setFallbackUri("forward:/fallback/sales-service"))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver())))
@@ -47,9 +49,10 @@ public class GatewayConfig {
                         .path("/api/analytics/**")
                         .filters(f -> f
                                 .rewritePath("/api/analytics/(?<segment>.*)", "/api/analytics/${segment}")
-                                .circuitBreaker(config -> config
-                                        .setName("analytics-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/analytics-service"))
+                                // Temporarily disabled circuit breaker for testing
+                                // .circuitBreaker(config -> config
+                                //         .setName("analytics-service-circuit-breaker")
+                                //         .setFallbackUri("forward:/fallback/analytics-service"))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver())))
@@ -60,9 +63,10 @@ public class GatewayConfig {
                         .path("/api/notifications/**")
                         .filters(f -> f
                                 .rewritePath("/api/notifications/(?<segment>.*)", "/api/notifications/${segment}")
-                                .circuitBreaker(config -> config
-                                        .setName("notification-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/notification-service"))
+                                // Temporarily disabled circuit breaker for testing
+                                // .circuitBreaker(config -> config
+                                //         .setName("notification-service-circuit-breaker")
+                                //         .setFallbackUri("forward:/fallback/notification-service"))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver())))
@@ -73,9 +77,11 @@ public class GatewayConfig {
                         .path("/api/auth/**")
                         .filters(f -> f
                                 .rewritePath("/api/auth/(?<segment>.*)", "/api/auth/${segment}")
-                                .circuitBreaker(config -> config
-                                        .setName("auth-service-circuit-breaker")
-                                        .setFallbackUri("forward:/fallback/auth-service")))
+                                // Temporarily disabled circuit breaker for testing
+                                // .circuitBreaker(config -> config
+                                //         .setName("auth-service-circuit-breaker")
+                                //         .setFallbackUri("forward:/fallback/auth-service"))
+                                )
                         .uri("lb://auth-service"))
                 
 

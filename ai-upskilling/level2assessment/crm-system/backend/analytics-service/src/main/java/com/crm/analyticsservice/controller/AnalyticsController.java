@@ -14,7 +14,6 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/analytics")
-@CrossOrigin(origins = "*")
 public class AnalyticsController {
 
     @Autowired
@@ -232,7 +231,7 @@ public class AnalyticsController {
     public ResponseEntity<Map<String, Object>> getSalesInsights() {
         Map<String, Object> insights = new java.util.HashMap<>();
         insights.put("trend", "Sales are increasing by 12% month-over-month");
-        insights.put("topPerformer", "John Doe - $150K this month");
+        insights.put("topPerformer", "Madhan M S - $150K this month");
         insights.put("opportunity", "High-value deals in Q4 pipeline");
         insights.put("recommendation", "Focus on enterprise customers");
         return ResponseEntity.ok(insights);

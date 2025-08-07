@@ -9,7 +9,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: false  # Disable discovery-based routes
           lower-case-service-id: true
           predicates:
             - name: Path

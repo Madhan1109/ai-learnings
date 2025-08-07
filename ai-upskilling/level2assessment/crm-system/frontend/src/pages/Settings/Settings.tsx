@@ -1,47 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
   Typography,
+  Tabs,
+  Tab,
   Grid,
   Card,
   CardContent,
   CardHeader,
+  TextField,
+  Button,
   Switch,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  TextField,
-  Button,
-  Avatar,
   List,
   ListItem,
-  ListItemText,
   ListItemIcon,
+  ListItemText,
   ListItemSecondaryAction,
+  Avatar,
   Divider,
-  Tabs,
-  Tab,
   Alert,
+  Snackbar,
 } from '@mui/material';
 import {
-  Settings as SettingsIcon,
   Person,
   Notifications,
-  Security,
   Palette,
-  Language,
-  Storage,
-  Backup,
-  Download,
-  Upload,
-  Delete,
+  Security,
   Save,
   Cancel,
+  Download,
+  Upload,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { RootState, useAppDispatch } from '../../store';
+import { authService } from '../../services/authService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -66,15 +65,21 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const SettingsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   
   const [tabValue, setTabValue] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
     phone: '',
   });
+
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     pushNotifications: true,
@@ -82,6 +87,7 @@ const SettingsPage: React.FC = () => {
     customerUpdates: true,
     systemAlerts: true,
   });
+
   const [appearanceSettings, setAppearanceSettings] = useState({
     theme: 'light',
     language: 'en',
@@ -89,12 +95,36 @@ const SettingsPage: React.FC = () => {
     dateFormat: 'MM/DD/YYYY',
   });
 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: '',
+      });
+    }
+  }, [user]);
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
   const handleProfileChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setProfileData(prev => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const handlePasswordChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordData(prev => ({
       ...prev,
       [field]: event.target.value,
     }));
@@ -114,9 +144,75 @@ const SettingsPage: React.FC = () => {
     }));
   };
 
-  const handleSaveProfile = () => {
-    // TODO: Implement save profile logic
-    console.log('Saving profile:', profileData);
+  const handleSaveProfile = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Validate required fields
+      if (!profileData.firstName.trim() || !profileData.lastName.trim() || !profileData.email.trim()) {
+        throw new Error('First name, last name, and email are required');
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(profileData.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Call the API to update profile
+      const updatedUser = await authService.updateProfile(profileData);
+      
+      // Update Redux state - for now just log the success
+      console.log('Profile updated successfully:', updatedUser);
+      
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Validate password fields
+      if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+        throw new Error('All password fields are required');
+      }
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error('New passwords do not match');
+      }
+
+      if (passwordData.newPassword.length < 8) {
+        throw new Error('New password must be at least 8 characters long');
+      }
+
+      // Call the API to change password
+      await authService.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
+      
+      // Clear password fields
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to change password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleExportData = () => {
@@ -138,6 +234,7 @@ const SettingsPage: React.FC = () => {
       <Paper sx={{ width: '100%' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="settings tabs">
           <Tab label="Profile" />
+          <Tab label="Security" />
           <Tab label="Notifications" />
           <Tab label="Appearance" />
           <Tab label="Data & Backup" />
@@ -163,6 +260,7 @@ const SettingsPage: React.FC = () => {
                         label="First Name"
                         value={profileData.firstName}
                         onChange={handleProfileChange('firstName')}
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -171,6 +269,7 @@ const SettingsPage: React.FC = () => {
                         label="Last Name"
                         value={profileData.lastName}
                         onChange={handleProfileChange('lastName')}
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -180,6 +279,7 @@ const SettingsPage: React.FC = () => {
                         type="email"
                         value={profileData.email}
                         onChange={handleProfileChange('email')}
+                        required
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -190,21 +290,32 @@ const SettingsPage: React.FC = () => {
                         onChange={handleProfileChange('phone')}
                       />
                     </Grid>
-
                   </Grid>
+                  
                   <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
                     <Button
                       variant="contained"
                       startIcon={<Save />}
                       onClick={handleSaveProfile}
+                      disabled={loading}
                     >
-                      Save Changes
+                      {loading ? 'Saving...' : 'Save Changes'}
                     </Button>
                     <Button
                       variant="outlined"
                       startIcon={<Cancel />}
+                      onClick={() => {
+                        if (user) {
+                          setProfileData({
+                            firstName: user.firstName || '',
+                            lastName: user.lastName || '',
+                            email: user.email || '',
+                            phone: '',
+                          });
+                        }
+                      }}
                     >
-                      Cancel
+                      Reset
                     </Button>
                   </Box>
                 </CardContent>
@@ -212,21 +323,105 @@ const SettingsPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={4}>
               <Card>
-                <CardHeader title="Account Security" />
+                <CardHeader title="Account Info" />
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <Avatar
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        fontSize: '1.5rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {user?.firstName?.charAt(0) || 'U'}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {user?.firstName} {user?.lastName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {user?.email}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="body2" color="text.secondary">
+                    Member since: N/A
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8}>
+              <Card>
+                <CardHeader
+                  title="Change Password"
+                  avatar={
+                    <Avatar sx={{ bgcolor: 'warning.main' }}>
+                      <Security />
+                    </Avatar>
+                  }
+                />
+                <CardContent>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Current Password"
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange('currentPassword')}
+                        required
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="New Password"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange('newPassword')}
+                        required
+                        helperText="Password must be at least 8 characters long"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Confirm New Password"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange('confirmPassword')}
+                        required
+                      />
+                    </Grid>
+                  </Grid>
+                  
+                  <Box sx={{ mt: 3 }}>
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      startIcon={<Security />}
+                      onClick={handleChangePassword}
+                      disabled={loading}
+                    >
+                      {loading ? 'Changing...' : 'Change Password'}
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card>
+                <CardHeader title="Security Settings" />
                 <CardContent>
                   <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Security />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Change Password"
-                        secondary="Update your account password"
-                      />
-                      <ListItemSecondaryAction>
-                        <Button size="small">Change</Button>
-                      </ListItemSecondaryAction>
-                    </ListItem>
                     <ListItem>
                       <ListItemIcon>
                         <Security />
@@ -239,6 +434,22 @@ const SettingsPage: React.FC = () => {
                         <Switch />
                       </ListItemSecondaryAction>
                     </ListItem>
+                    <ListItem>
+                      <ListItemIcon>
+                        <Security />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Session Timeout"
+                        secondary="Auto-logout after inactivity"
+                      />
+                      <ListItemSecondaryAction>
+                        <Select size="small" value="30" sx={{ minWidth: 80 }}>
+                          <MenuItem value={15}>15 min</MenuItem>
+                          <MenuItem value={30}>30 min</MenuItem>
+                          <MenuItem value={60}>1 hour</MenuItem>
+                        </Select>
+                      </ListItemSecondaryAction>
+                    </ListItem>
                   </List>
                 </CardContent>
               </Card>
@@ -246,293 +457,232 @@ const SettingsPage: React.FC = () => {
           </Grid>
         </TabPanel>
 
-        <TabPanel value={tabValue} index={1}>
+        <TabPanel value={tabValue} index={2}>
           <Card>
             <CardHeader
               title="Notification Preferences"
               avatar={
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                <Avatar sx={{ bgcolor: 'info.main' }}>
                   <Notifications />
                 </Avatar>
               }
             />
             <CardContent>
-              <List>
-                <ListItem>
-                  <ListItemIcon>
-                    <Notifications />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Email Notifications"
-                    secondary="Receive notifications via email"
-                  />
-                  <ListItemSecondaryAction>
-                    <Switch
-                      checked={notificationSettings.emailNotifications}
-                      onChange={handleNotificationChange('emailNotifications')}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemIcon>
-                    <Notifications />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Push Notifications"
-                    secondary="Receive push notifications in browser"
-                  />
-                  <ListItemSecondaryAction>
-                    <Switch
-                      checked={notificationSettings.pushNotifications}
-                      onChange={handleNotificationChange('pushNotifications')}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemIcon>
-                    <Notifications />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Sales Alerts"
-                    secondary="Get notified about sales opportunities"
-                  />
-                  <ListItemSecondaryAction>
-                    <Switch
-                      checked={notificationSettings.salesAlerts}
-                      onChange={handleNotificationChange('salesAlerts')}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemIcon>
-                    <Notifications />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Customer Updates"
-                    secondary="Get notified about customer activities"
-                  />
-                  <ListItemSecondaryAction>
-                    <Switch
-                      checked={notificationSettings.customerUpdates}
-                      onChange={handleNotificationChange('customerUpdates')}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-                <ListItem>
-                  <ListItemIcon>
-                    <Notifications />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="System Alerts"
-                    secondary="Get notified about system events"
-                  />
-                  <ListItemSecondaryAction>
-                    <Switch
-                      checked={notificationSettings.systemAlerts}
-                      onChange={handleNotificationChange('systemAlerts')}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-              </List>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemText
+                        primary="Email Notifications"
+                        secondary="Receive notifications via email"
+                      />
+                      <Switch
+                        checked={notificationSettings.emailNotifications}
+                        onChange={handleNotificationChange('emailNotifications')}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary="Push Notifications"
+                        secondary="Receive browser notifications"
+                      />
+                      <Switch
+                        checked={notificationSettings.pushNotifications}
+                        onChange={handleNotificationChange('pushNotifications')}
+                      />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemText
+                        primary="Sales Alerts"
+                        secondary="Get notified about sales activities"
+                      />
+                      <Switch
+                        checked={notificationSettings.salesAlerts}
+                        onChange={handleNotificationChange('salesAlerts')}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary="Customer Updates"
+                        secondary="Notifications about customer changes"
+                      />
+                      <Switch
+                        checked={notificationSettings.customerUpdates}
+                        onChange={handleNotificationChange('customerUpdates')}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary="System Alerts"
+                        secondary="Important system notifications"
+                      />
+                      <Switch
+                        checked={notificationSettings.systemAlerts}
+                        onChange={handleNotificationChange('systemAlerts')}
+                      />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
             </CardContent>
           </Card>
         </TabPanel>
 
-        <TabPanel value={tabValue} index={2}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardHeader
-                  title="Appearance"
-                  avatar={
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      <Palette />
-                    </Avatar>
-                  }
-                />
-                <CardContent>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel>Theme</InputLabel>
-                        <Select
-                          value={appearanceSettings.theme}
-                          onChange={handleAppearanceChange('theme')}
-                          label="Theme"
-                        >
-                          <MenuItem value="light">Light</MenuItem>
-                          <MenuItem value="dark">Dark</MenuItem>
-                          <MenuItem value="auto">Auto</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel>Language</InputLabel>
-                        <Select
-                          value={appearanceSettings.language}
-                          onChange={handleAppearanceChange('language')}
-                          label="Language"
-                        >
-                          <MenuItem value="en">English</MenuItem>
-                          <MenuItem value="es">Spanish</MenuItem>
-                          <MenuItem value="fr">French</MenuItem>
-                          <MenuItem value="de">German</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel>Timezone</InputLabel>
-                        <Select
-                          value={appearanceSettings.timezone}
-                          onChange={handleAppearanceChange('timezone')}
-                          label="Timezone"
-                        >
-                          <MenuItem value="UTC">UTC</MenuItem>
-                          <MenuItem value="EST">Eastern Time</MenuItem>
-                          <MenuItem value="PST">Pacific Time</MenuItem>
-                          <MenuItem value="GMT">GMT</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel>Date Format</InputLabel>
-                        <Select
-                          value={appearanceSettings.dateFormat}
-                          onChange={handleAppearanceChange('dateFormat')}
-                          label="Date Format"
-                        >
-                          <MenuItem value="MM/DD/YYYY">MM/DD/YYYY</MenuItem>
-                          <MenuItem value="DD/MM/YYYY">DD/MM/YYYY</MenuItem>
-                          <MenuItem value="YYYY-MM-DD">YYYY-MM-DD</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardHeader title="Preview" />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Theme preview will be shown here based on your selection.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+        <TabPanel value={tabValue} index={3}>
+          <Card>
+            <CardHeader
+              title="Appearance Settings"
+              avatar={
+                <Avatar sx={{ bgcolor: 'secondary.main' }}>
+                  <Palette />
+                </Avatar>
+              }
+            />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Theme</InputLabel>
+                    <Select
+                      value={appearanceSettings.theme}
+                      label="Theme"
+                      onChange={handleAppearanceChange('theme')}
+                    >
+                      <MenuItem value="light">Light</MenuItem>
+                      <MenuItem value="dark">Dark</MenuItem>
+                      <MenuItem value="auto">Auto</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Language</InputLabel>
+                    <Select
+                      value={appearanceSettings.language}
+                      label="Language"
+                      onChange={handleAppearanceChange('language')}
+                    >
+                      <MenuItem value="en">English</MenuItem>
+                      <MenuItem value="es">Spanish</MenuItem>
+                      <MenuItem value="fr">French</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Timezone</InputLabel>
+                    <Select
+                      value={appearanceSettings.timezone}
+                      label="Timezone"
+                      onChange={handleAppearanceChange('timezone')}
+                    >
+                      <MenuItem value="UTC">UTC</MenuItem>
+                      <MenuItem value="EST">Eastern Time</MenuItem>
+                      <MenuItem value="PST">Pacific Time</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Date Format</InputLabel>
+                    <Select
+                      value={appearanceSettings.dateFormat}
+                      label="Date Format"
+                      onChange={handleAppearanceChange('dateFormat')}
+                    >
+                      <MenuItem value="MM/DD/YYYY">MM/DD/YYYY</MenuItem>
+                      <MenuItem value="DD/MM/YYYY">DD/MM/YYYY</MenuItem>
+                      <MenuItem value="YYYY-MM-DD">YYYY-MM-DD</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </TabPanel>
 
-        <TabPanel value={tabValue} index={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardHeader
-                  title="Data Export"
-                  avatar={
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      <Download />
-                    </Avatar>
-                  }
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Export your data in various formats for backup or migration purposes.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Download />}
-                      onClick={handleExportData}
-                    >
-                      Export Data
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Backup />}
-                    >
-                      Backup Settings
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Card>
-                <CardHeader
-                  title="Data Import"
-                  avatar={
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      <Upload />
-                    </Avatar>
-                  }
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Import data from external sources or restore from backup.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Upload />}
-                      onClick={handleImportData}
-                    >
-                      Import Data
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Storage />}
-                    >
-                      Restore Backup
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card>
-                <CardHeader
-                  title="Danger Zone"
-                  avatar={
-                    <Avatar sx={{ bgcolor: 'error.main' }}>
-                      <Delete />
-                    </Avatar>
-                  }
-                />
-                <CardContent>
-                  <Alert severity="warning" sx={{ mb: 2 }}>
-                    These actions are irreversible. Please proceed with caution.
-                  </Alert>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<Delete />}
-                    >
-                      Delete Account
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<Storage />}
-                    >
-                      Clear All Data
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+        <TabPanel value={tabValue} index={4}>
+          <Card>
+            <CardHeader
+              title="Data & Backup"
+              avatar={
+                <Avatar sx={{ bgcolor: 'success.main' }}>
+                  <SettingsIcon />
+                </Avatar>
+              }
+            />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Export Data
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Download your data in various formats
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Download />}
+                        onClick={handleExportData}
+                      >
+                        Export Data
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Import Data
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Import data from external sources
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Upload />}
+                        onClick={handleImportData}
+                      >
+                        Import Data
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </TabPanel>
       </Paper>
+
+      {/* Success/Error Messages */}
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={() => setSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setSuccess(false)} severity="success">
+          Settings updated successfully!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={5000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

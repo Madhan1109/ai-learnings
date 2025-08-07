@@ -7,11 +7,11 @@ export interface Customer {
   email: string;
   phone: string;
   company: string;
-  industry: string;
+  industry?: string;
   status: string;
   leadScore: number;
   source: string;
-  assignedTo: number;
+  assignedTo?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -62,9 +62,9 @@ const initialState: CustomerState = {
   },
 };
 
-export const fetchCustomers = createAsyncThunk(
+export const fetchCustomers = createAsyncThunk<{ data: Customer[]; total: number; page: number; limit: number; totalPages: number }, { page?: number; limit?: number; filters?: any }>(
   'customers/fetchCustomers',
-  async (params: { page?: number; limit?: number; filters?: any }, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
       const response = await customerService.getCustomers(params);
       return response;
@@ -74,10 +74,14 @@ export const fetchCustomers = createAsyncThunk(
   }
 );
 
-export const createCustomer = createAsyncThunk(
+export const createCustomer = createAsyncThunk<Customer, Partial<Customer>>(
   'customers/createCustomer',
-  async (customerData: Partial<Customer>, { rejectWithValue }) => {
+  async (customerData, { rejectWithValue }) => {
     try {
+      // Add null safety check
+      if (!customerData) {
+        return rejectWithValue('Customer data is required for creation');
+      }
       const response = await customerService.createCustomer(customerData);
       return response;
     } catch (error: any) {
@@ -86,10 +90,14 @@ export const createCustomer = createAsyncThunk(
   }
 );
 
-export const updateCustomer = createAsyncThunk(
+export const updateCustomer = createAsyncThunk<Customer, { id: number; data: Partial<Customer> }>(
   'customers/updateCustomer',
-  async ({ id, data }: { id: number; data: Partial<Customer> }, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
+      // Add null safety check
+      if (!data) {
+        return rejectWithValue('Customer data is required for update');
+      }
       const response = await customerService.updateCustomer(id.toString(), data);
       return response;
     } catch (error: any) {
@@ -98,9 +106,9 @@ export const updateCustomer = createAsyncThunk(
   }
 );
 
-export const deleteCustomer = createAsyncThunk(
+export const deleteCustomer = createAsyncThunk<number, number>(
   'customers/deleteCustomer',
-  async (id: number, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       await customerService.deleteCustomer(id.toString());
       return id;
@@ -111,9 +119,9 @@ export const deleteCustomer = createAsyncThunk(
 );
 
 // These methods are not available in customerService, so we'll use available methods instead
-export const getHighValueLeads = createAsyncThunk(
+export const getHighValueLeads = createAsyncThunk<Customer[], number>(
   'customers/getHighValueLeads',
-  async (minScore: number, { rejectWithValue }) => {
+  async (minScore, { rejectWithValue }) => {
     try {
       const response = await customerService.getCustomers({ minLeadScore: minScore });
       return response.data.filter((customer: any) => customer.leadScore >= minScore);
@@ -123,9 +131,9 @@ export const getHighValueLeads = createAsyncThunk(
   }
 );
 
-export const getNextBestAction = createAsyncThunk(
+export const getNextBestAction = createAsyncThunk<{ customer: Customer; nextAction: string }, number>(
   'customers/getNextBestAction',
-  async (customerId: number, { rejectWithValue }) => {
+  async (customerId, { rejectWithValue }) => {
     try {
       const response = await customerService.getCustomer(customerId.toString());
       return { customer: response, nextAction: 'Follow up call' };
@@ -164,11 +172,15 @@ const customerSlice = createSlice({
       })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
         state.loading = false;
-        state.customers = action.payload.data as unknown as Customer[];
+        console.log('Customer slice received payload:', action.payload);
+        // Handle both response formats: { data: [...] } and direct array
+        const customers = Array.isArray(action.payload) ? action.payload : action.payload.data;
+        console.log('Processed customers:', customers);
+        state.customers = customers as Customer[];
         state.pagination = {
-          page: action.payload.page,
-          limit: action.payload.limit,
-          total: action.payload.total
+          page: action.payload.page || 1,
+          limit: action.payload.limit || 10,
+          total: action.payload.total || customers.length
         };
       })
       .addCase(fetchCustomers.rejected, (state, action) => {

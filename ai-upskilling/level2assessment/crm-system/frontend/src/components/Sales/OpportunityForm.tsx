@@ -66,10 +66,10 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
     } else {
       setFormData({
         title: '',
-        value: 0,
+        value: 1000, // Set a default value greater than 0
         stage: 'prospecting',
         probability: 25,
-        expectedCloseDate: '',
+        expectedCloseDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default to 30 days from now
         customerId: '',
         customerName: '',
         description: '',
@@ -101,44 +101,64 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
   };
 
   const validateForm = () => {
+    console.log('Validating form with data:', formData);
+    console.log('Available customers:', customers);
     const newErrors: Partial<Record<keyof Opportunity, string>> = {};
 
     if (!formData.title.trim()) {
       newErrors.title = 'Opportunity name is required';
+      console.log('Title validation failed');
     }
 
-    if (!formData.description?.trim()) {
-      newErrors.description = 'Description is required';
-    }
+    // Description is optional, so we don't validate it
 
     if (!formData.customerId) {
-      newErrors.customerId = 'Customer is required';
+      if (customers.length === 0) {
+        newErrors.customerId = 'No customers available. Please add customers first.';
+      } else {
+        newErrors.customerId = 'Customer is required';
+      }
+      console.log('Customer validation failed');
     }
 
     if (!formData.stage) {
       newErrors.stage = 'Stage is required';
+      console.log('Stage validation failed');
     }
 
     if (formData.value <= 0) {
       newErrors.value = 'Value must be greater than 0';
+      console.log('Value validation failed');
     }
 
     if (!formData.expectedCloseDate) {
       newErrors.expectedCloseDate = 'Expected close date is required';
+      console.log('Expected close date validation failed');
     }
 
     if (formData.probability < 0 || formData.probability > 100) {
       newErrors.probability = 'Probability must be between 0 and 100';
+      console.log('Probability validation failed');
     }
 
+    console.log('Validation errors:', newErrors);
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log('Form is valid:', isValid);
+    return isValid;
   };
 
   const handleSubmit = () => {
+    console.log('OpportunityForm handleSubmit called');
+    console.log('Form data:', formData);
+    console.log('Validation result:', validateForm());
+    
     if (validateForm()) {
+      console.log('Form is valid, calling onSubmit');
       onSubmit(formData);
       onClose();
+    } else {
+      console.log('Form validation failed');
     }
   };
 
@@ -158,6 +178,8 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
     }
   };
 
+  console.log('OpportunityForm render - open:', open, 'opportunity:', opportunity);
+  
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>

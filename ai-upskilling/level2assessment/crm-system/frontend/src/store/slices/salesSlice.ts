@@ -4,7 +4,8 @@ import { salesService } from '../../services/salesService';
 export interface Opportunity {
   id: number;
   customerId: number;
-  title: string;
+  title?: string; // Optional for backward compatibility
+  name?: string; // Optional for backward compatibility
   description: string;
   value: number;
   stage: string;
@@ -98,9 +99,9 @@ const initialState: SalesState = {
   },
 };
 
-export const fetchOpportunities = createAsyncThunk(
+export const fetchOpportunities = createAsyncThunk<{ data: Opportunity[]; total: number; page: number; limit: number; totalPages: number }, { page?: number; limit?: number; filters?: any }>(
   'sales/fetchOpportunities',
-  async (params: { page?: number; limit?: number; filters?: any }, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
       const response = await salesService.getOpportunities(params);
       return response;
@@ -110,9 +111,9 @@ export const fetchOpportunities = createAsyncThunk(
   }
 );
 
-export const createOpportunity = createAsyncThunk(
+export const createOpportunity = createAsyncThunk<Opportunity, Partial<Opportunity>>(
   'sales/createOpportunity',
-  async (opportunityData: Partial<Opportunity>, { rejectWithValue }) => {
+  async (opportunityData, { rejectWithValue }) => {
     try {
       const response = await salesService.createOpportunity(opportunityData);
       return response;
@@ -122,9 +123,9 @@ export const createOpportunity = createAsyncThunk(
   }
 );
 
-export const updateOpportunity = createAsyncThunk(
+export const updateOpportunity = createAsyncThunk<Opportunity, { id: number; data: Partial<Opportunity> }>(
   'sales/updateOpportunity',
-  async ({ id, data }: { id: number; data: Partial<Opportunity> }, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await salesService.updateOpportunity(id.toString(), data);
       return response;
@@ -134,7 +135,19 @@ export const updateOpportunity = createAsyncThunk(
   }
 );
 
-export const fetchTasks = createAsyncThunk(
+export const deleteOpportunity = createAsyncThunk<number, number>(
+  'sales/deleteOpportunity',
+  async (id, { rejectWithValue }) => {
+    try {
+      await salesService.deleteOpportunity(id.toString());
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete opportunity');
+    }
+  }
+);
+
+export const fetchTasks = createAsyncThunk<Task[], void>(
   'sales/fetchTasks',
   async (_, { rejectWithValue }) => {
     try {
@@ -146,9 +159,9 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
-export const createTask = createAsyncThunk(
+export const createTask = createAsyncThunk<Task, Partial<Task>>(
   'sales/createTask',
-  async (taskData: Partial<Task>, { rejectWithValue }) => {
+  async (taskData, { rejectWithValue }) => {
     try {
       const response = await salesService.createTask(taskData);
       return response;
@@ -158,7 +171,31 @@ export const createTask = createAsyncThunk(
   }
 );
 
-export const getPipelineHealth = createAsyncThunk(
+export const updateTask = createAsyncThunk<Task, { id: number; data: Partial<Task> }>(
+  'sales/updateTask',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await salesService.updateTask(id.toString(), data);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update task');
+    }
+  }
+);
+
+export const deleteTask = createAsyncThunk<number, number>(
+  'sales/deleteTask',
+  async (id, { rejectWithValue }) => {
+    try {
+      await salesService.deleteTask(id.toString());
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete task');
+    }
+  }
+);
+
+export const getPipelineHealth = createAsyncThunk<any, void>(
   'sales/getPipelineHealth',
   async (_, { rejectWithValue }) => {
     try {
@@ -170,7 +207,7 @@ export const getPipelineHealth = createAsyncThunk(
   }
 );
 
-export const fetchSalesMetrics = createAsyncThunk(
+export const fetchSalesMetrics = createAsyncThunk<any, void>(
   'sales/fetchSalesMetrics',
   async (_, { rejectWithValue }) => {
     try {
@@ -211,11 +248,15 @@ const salesSlice = createSlice({
       })
       .addCase(fetchOpportunities.fulfilled, (state, action) => {
         state.loading = false;
-        state.opportunities = action.payload.data as unknown as Opportunity[];
+        console.log('Sales slice received opportunities payload:', action.payload);
+        // Handle both response formats: { data: [...] } and direct array
+        const opportunities = Array.isArray(action.payload) ? action.payload : action.payload.data;
+        console.log('Processed opportunities:', opportunities);
+        state.opportunities = opportunities as Opportunity[];
         state.pagination = {
-          page: action.payload.page,
-          limit: action.payload.limit,
-          total: action.payload.total
+          page: action.payload.page || 1,
+          limit: action.payload.limit || 10,
+          total: action.payload.total || opportunities.length
         };
       })
       .addCase(fetchOpportunities.rejected, (state, action) => {
@@ -237,13 +278,42 @@ const salesSlice = createSlice({
           state.selectedOpportunity = opportunity;
         }
       })
+      // Delete Opportunity
+      .addCase(deleteOpportunity.fulfilled, (state, action) => {
+        state.opportunities = state.opportunities.filter(o => o.id !== action.payload);
+        if (state.selectedOpportunity?.id === action.payload) {
+          state.selectedOpportunity = null;
+        }
+      })
       // Fetch Tasks
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        state.tasks = action.payload as unknown as Task[];
+        console.log('Sales slice received tasks payload:', action.payload);
+        // fetchTasks returns Task[] directly, not wrapped in data property
+        const tasks = action.payload;
+        console.log('Processed tasks:', tasks);
+        state.tasks = tasks as Task[];
       })
       // Create Task
       .addCase(createTask.fulfilled, (state, action) => {
         state.tasks.unshift(action.payload as unknown as Task);
+      })
+      // Update Task
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const task = action.payload as unknown as Task;
+        const index = state.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) {
+          state.tasks[index] = task;
+        }
+        if (state.selectedTask?.id === task.id) {
+          state.selectedTask = task;
+        }
+      })
+      // Delete Task
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.tasks = state.tasks.filter(t => t.id !== action.payload);
+        if (state.selectedTask?.id === action.payload) {
+          state.selectedTask = null;
+        }
       })
       // Get Pipeline Health
       .addCase(getPipelineHealth.fulfilled, (state, action) => {
@@ -251,7 +321,9 @@ const salesSlice = createSlice({
       })
       // Fetch Sales Metrics
       .addCase(fetchSalesMetrics.fulfilled, (state, action) => {
+        console.log('Sales slice received metrics payload:', action.payload);
         state.metrics = action.payload;
+        console.log('Updated state metrics:', state.metrics);
       });
   },
 });

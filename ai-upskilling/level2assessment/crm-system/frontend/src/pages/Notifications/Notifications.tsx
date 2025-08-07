@@ -79,13 +79,13 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
-  const filteredNotifications = notifications.filter((notification: any) => {
+  const filteredNotifications = notifications?.filter((notification: any) => {
     const matchesFilter = filter === 'all' || notification.type === filter;
     const matchesReadStatus = showRead || !notification.read;
     return matchesFilter && matchesReadStatus;
-  });
+  }) || [];
 
-  const unreadCount = notifications.filter((n: Notification) => !n.read).length;
+  const unreadCount = notifications?.filter((n: Notification) => !n.read).length || 0;
 
   if (loading) return <LoadingSpinner />;
 
@@ -124,7 +124,7 @@ const NotificationsPage: React.FC = () => {
                 </Badge>
                 <Box>
                   <Typography variant="h6">
-                    {notifications.length}
+                    {notifications?.length || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Notifications
@@ -162,7 +162,7 @@ const NotificationsPage: React.FC = () => {
                 </Avatar>
                 <Box>
                   <Typography variant="h6">
-                    {notifications.filter((n: Notification) => n.read).length}
+                    {notifications?.filter((n: Notification) => n.read).length || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Read

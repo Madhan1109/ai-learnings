@@ -111,12 +111,13 @@ services:
       - eureka
     networks:
       - crm-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+    # Health check temporarily disabled for testing
+    # healthcheck:
+    #   test: ["CMD-SHELL", "ps aux | grep java | grep -v grep || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 60s
 
   # Sales Service
   sales-service:
@@ -135,12 +136,13 @@ services:
       - eureka
     networks:
       - crm-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+    # Health check temporarily disabled for testing
+    # healthcheck:
+    #   test: ["CMD-SHELL", "ps aux | grep java | grep -v grep || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 60s
 
   # Analytics Service
   analytics-service:

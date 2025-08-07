@@ -37,7 +37,7 @@ class CustomerControllerTest {
     void setUp() {
         testCustomer = new Customer();
         testCustomer.setId(1L);
-        testCustomer.setName("John Doe");
+        testCustomer.setName("Madhan M S");
         testCustomer.setEmail("john.doe@example.com");
         testCustomer.setPhone("+1234567890");
         testCustomer.setCompany("Test Company");
@@ -50,7 +50,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(get("/api/customers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("John Doe"))
+                .andExpect(jsonPath("$[0].name").value("Madhan M S"))
                 .andExpect(jsonPath("$[0].email").value("john.doe@example.com"));
     }
 
@@ -80,7 +80,7 @@ class CustomerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCustomer)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("John Doe"));
+                .andExpect(jsonPath("$.name").value("Madhan M S"));
     }
 
     // @Test

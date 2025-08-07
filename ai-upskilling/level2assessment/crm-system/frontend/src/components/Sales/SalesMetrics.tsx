@@ -22,24 +22,30 @@ import {
 
 interface SalesMetricsProps {
   metrics: {
-    totalRevenue: number;
-    totalOpportunities: number;
-    winRate: number;
-    avgDealSize: number;
-    pipelineValue: number;
-    conversionRate: number;
+    totalRevenue?: number;
+    totalOpportunities?: number;
+    winRate?: number;
+    avgDealSize?: number;
+    pipelineValue?: number;
+    conversionRate?: number;
   };
 }
 
 const SalesMetrics: React.FC<SalesMetricsProps> = ({ metrics }) => {
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | undefined) => {
+    if (amount === undefined || amount === null) {
+      return '$0.00';
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
   };
 
-  const formatPercentage = (value: number) => {
+  const formatPercentage = (value: number | undefined) => {
+    if (value === undefined || value === null) {
+      return '0.0%';
+    }
     return `${value.toFixed(1)}%`;
   };
 
@@ -147,28 +153,28 @@ const SalesMetrics: React.FC<SalesMetricsProps> = ({ metrics }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2">Total Opportunities</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                    {metrics.totalOpportunities}
+                    {metrics.totalOpportunities || 0}
                   </Typography>
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2">Won Deals</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                    {Math.round((metrics.winRate / 100) * metrics.totalOpportunities)}
+                    {Math.round(((metrics.winRate || 0) / 100) * (metrics.totalOpportunities || 0))}
                   </Typography>
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2">Lost Deals</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'error.main' }}>
-                    {Math.round(((100 - metrics.winRate) / 100) * metrics.totalOpportunities)}
+                    {Math.round(((100 - (metrics.winRate || 0)) / 100) * (metrics.totalOpportunities || 0))}
                   </Typography>
                 </Box>
                 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Typography variant="body2">Active Pipeline</Typography>
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    {Math.round((metrics.conversionRate / 100) * metrics.totalOpportunities)}
+                    {Math.round(((metrics.conversionRate || 0) / 100) * (metrics.totalOpportunities || 0))}
                   </Typography>
                 </Box>
               </CardContent>

@@ -22,7 +22,7 @@ spring:
   
   data:
     redis:
-      host: localhost
+      host: ${SPRING_REDIS_HOST:localhost}
       port: 6379
       timeout: 2000ms
   
@@ -36,6 +36,16 @@ spring:
       time-to-live: 600000 # 10 minutes
       cache-null-values: false
 
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
 eureka:
   client:
     service-url:
@@ -45,6 +55,21 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://postgres:5432/crm_system
+  data:
+    redis:
+      host: redis
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://eureka:8761/eureka/
 
 # AI Service Configuration
 ai:

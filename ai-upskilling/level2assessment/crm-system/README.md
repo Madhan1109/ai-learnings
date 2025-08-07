@@ -1,9 +1,41 @@
 # 🚀 AI-Powered CRM System
 
-## Project Overview
+## 📚 **Documentation Index**
+
+This project includes comprehensive documentation organized in the `docs/` folder:
+
+### 🏗️ **Architecture & Design**
+- [📋 Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md) - Complete system architecture with visual diagrams
+- [🏗️ Class Diagram](docs/CLASS_DIAGRAM.md) - Detailed class structures and relationships
+- [📐 Architecture Design](docs/ARCHITECTURE_DESIGN.md) - System design and database schema
+- [🧩 Component Architecture](docs/COMPONENT_ARCHITECTURE.md) - Frontend and backend component structure
+
+### 📖 **User & Development Guides**
+- [👥 User Guide](docs/USER_GUIDE.md) - Complete user manual and feature documentation
+- [🚀 Deployment Guide](docs/DEPLOYMENT_GUIDE.md) - Production deployment instructions
+- [🔧 Development Process](docs/DEVELOPMENT_PROCESS.md) - Development workflow and practices
+- [📋 Development Plan](docs/DEVELOPMENT_PLAN.md) - Project planning and milestones
+
+### 🔧 **Technical Documentation**
+- [📡 API Documentation](docs/API_DOCUMENTATION.md) - Complete API reference
+- [✅ API Endpoint Validation](docs/API_ENDPOINT_VALIDATION.md) - API testing and validation
+- [🤖 AI Prompt Library](docs/AI_PROMPT_LIBRARY.md) - AI/ML implementation guides
+- [🧪 Integration Testing Results](docs/INTEGRATION_TESTING_RESULTS.md) - Test coverage and results
+
+### 📊 **Project Management**
+- [📝 Reflection Report](docs/REFLECTION_REPORT.md) - Project assessment and learnings
+- [🎬 Demo Video Script](docs/DEMO_VIDEO_SCRIPT.md) - System demonstration guide
+- [⚡ Startup Script Optimization](docs/STARTUP_SCRIPT_OPTIMIZATION.md) - Performance optimization
+- [🐛 Runtime Issues](docs/RUNTIME_ISSUES.md) - Known issues and solutions
+- [✅ Runtime Issues Solved](docs/RUNTIME_ISSUES_SOLVED.md) - Resolved issues documentation
+
+---
+
+## 🎯 **Project Overview**
+
 A production-ready Customer Relationship Management (CRM) system built with microservices architecture, featuring AI-powered insights, real-time collaboration, and advanced analytics.
 
-## 🏗️ Architecture
+## 🏗️ **Architecture**
 
 ### Microservices Architecture
 - **Customer Service**: Customer management and profiles
@@ -23,7 +55,7 @@ A production-ready Customer Relationship Management (CRM) system built with micr
 - **Real-time**: WebSocket with Socket.io
 - **Containerization**: Docker & Docker Compose
 
-## 🎯 Unique Standout Features
+## 🎯 **Unique Standout Features**
 
 ### AI-Powered Features
 - **Smart Lead Scoring**: AI predicts conversion probability
@@ -51,7 +83,7 @@ A production-ready Customer Relationship Management (CRM) system built with micr
 - **Custom Dashboards**: User-configurable widgets
 - **Export Capabilities**: PDF, Excel, CSV with custom formatting
 
-## 🚀 Quick Start
+## 🚀 **Quick Start**
 
 ### Prerequisites
 - Java 17+
@@ -123,7 +155,7 @@ All scripts are organized in the `start-up-scripts/` folder:
 - `start-up-scripts/health-check.sh` - Health monitoring
 - `start-up-scripts/deploy.sh` - Deployment script
 
-## 📊 Features
+## 📊 **Features**
 
 ### Core CRM Features
 - ✅ Customer Management
@@ -147,7 +179,7 @@ All scripts are organized in the `start-up-scripts/` folder:
 - ✅ Multi-language Support
 - ✅ Role-based Access Control
 
-## 🔧 Development
+## 🔧 **Development**
 
 ### Backend Services
 ```bash
@@ -171,19 +203,16 @@ npm install
 npm start
 ```
 
-## 📚 Documentation
-- [API Documentation](docs/api.md)
-- [Architecture Guide](docs/architecture.md)
-- [Deployment Guide](docs/deployment.md)
-- [AI Features Guide](docs/ai-features.md)
+## 🤝 **Contributing**
 
-## 🤝 Contributing
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-## 📄 License
+## 📄 **License**
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Assessment Features
+## 🏆 **Assessment Features**
+
 This project demonstrates:
 - ✅ Microservices Architecture
 - ✅ AI/ML Integration
@@ -192,4 +221,16 @@ This project demonstrates:
 - ✅ Production-ready Code
 - ✅ Comprehensive Testing
 - ✅ Security Best Practices
-- ✅ Performance Optimization 
+- ✅ Performance Optimization
+
+## 📞 **Support**
+
+For technical support or questions about the project:
+- Check the [📖 User Guide](docs/USER_GUIDE.md) for common issues
+- Review [🐛 Runtime Issues](docs/RUNTIME_ISSUES.md) for known problems
+- Consult [✅ Runtime Issues Solved](docs/RUNTIME_ISSUES_SOLVED.md) for solutions
+- Refer to [📡 API Documentation](docs/API_DOCUMENTATION.md) for integration help
+
+---
+
+**📚 For detailed documentation, please refer to the individual files in the `docs/` folder.**

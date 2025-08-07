@@ -38,18 +38,26 @@ interface Prediction {
 }
 
 interface PredictiveAnalyticsProps {
-  predictions: Prediction[];
+  predictions?: Prediction[] | any;
 }
 
 const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }) => {
-  const formatCurrency = (amount: number) => {
+  // Ensure predictions is an array
+  const predictionsArray = Array.isArray(predictions) ? predictions : [];
+  const formatCurrency = (amount: number | undefined) => {
+    if (amount === undefined || amount === null) {
+      return '$0.00';
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
   };
 
-  const formatPercentage = (value: number) => {
+  const formatPercentage = (value: number | undefined) => {
+    if (value === undefined || value === null) {
+      return '0.0%';
+    }
     return `${value.toFixed(1)}%`;
   };
 
@@ -87,7 +95,13 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
     }
   };
 
-  const calculateGrowth = (current: number, predicted: number) => {
+  const calculateGrowth = (current: number | undefined, predicted: number | undefined) => {
+    if (current === undefined || current === null || predicted === undefined || predicted === null) {
+      return 0;
+    }
+    if (current === 0) {
+      return predicted > 0 ? 100 : 0;
+    }
     return ((predicted - current) / current) * 100;
   };
 
@@ -99,35 +113,35 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
       </Box>
 
       <Grid container spacing={3}>
-        {predictions.map((prediction) => {
-          const growth = calculateGrowth(prediction.currentValue, prediction.predictedValue);
+        {predictionsArray.map((prediction) => {
+          const growth = calculateGrowth(prediction?.currentValue, prediction?.predictedValue);
           
           return (
-            <Grid item xs={12} md={6} key={prediction.id}>
+            <Grid item xs={12} md={6} key={prediction?.id || Math.random()}>
               <Card sx={{ height: '100%' }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.main' }}>
-                      {getMetricIcon(prediction.metric)}
+                      {getMetricIcon(prediction?.metric || '')}
                     </Avatar>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <Chip
-                        label={prediction.timeframe}
+                        label={prediction?.timeframe || 'N/A'}
                         size="small"
                         color="primary"
                         variant="outlined"
                       />
                       <Chip
-                        label={prediction.trend}
+                        label={prediction?.trend || 'stable'}
                         size="small"
-                        color={getTrendColor(prediction.trend) as any}
-                        icon={getTrendIcon(prediction.trend)}
+                        color={getTrendColor(prediction?.trend || 'stable') as any}
+                        icon={getTrendIcon(prediction?.trend || 'stable')}
                       />
                     </Box>
                   </Box>
 
                   <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
-                    {prediction.metric}
+                    {prediction?.metric || 'Unknown Metric'}
                   </Typography>
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -136,11 +150,11 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
                         Current
                       </Typography>
                       <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                        {prediction.metric.toLowerCase().includes('revenue') 
-                          ? formatCurrency(prediction.currentValue)
-                          : prediction.metric.toLowerCase().includes('conversion')
-                          ? formatPercentage(prediction.currentValue)
-                          : prediction.currentValue.toLocaleString()}
+                        {prediction?.metric?.toLowerCase().includes('revenue') 
+                          ? formatCurrency(prediction?.currentValue)
+                          : prediction?.metric?.toLowerCase().includes('conversion')
+                          ? formatPercentage(prediction?.currentValue)
+                          : (prediction?.currentValue || 0).toLocaleString()}
                       </Typography>
                     </Box>
                     
@@ -149,11 +163,11 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
                         Predicted
                       </Typography>
                       <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                        {prediction.metric.toLowerCase().includes('revenue') 
-                          ? formatCurrency(prediction.predictedValue)
-                          : prediction.metric.toLowerCase().includes('conversion')
-                          ? formatPercentage(prediction.predictedValue)
-                          : prediction.predictedValue.toLocaleString()}
+                        {prediction?.metric?.toLowerCase().includes('revenue') 
+                          ? formatCurrency(prediction?.predictedValue)
+                          : prediction?.metric?.toLowerCase().includes('conversion')
+                          ? formatPercentage(prediction?.predictedValue)
+                          : (prediction?.predictedValue || 0).toLocaleString()}
                       </Typography>
                     </Box>
                   </Box>
@@ -185,13 +199,13 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
                         AI Confidence
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {prediction.confidence}%
+                        {prediction?.confidence || 0}%
                       </Typography>
                     </Box>
                     <LinearProgress
                       variant="determinate"
-                      value={prediction.confidence}
-                      color={getConfidenceColor(prediction.confidence)}
+                      value={prediction?.confidence || 0}
+                      color={getConfidenceColor(prediction?.confidence || 0)}
                       sx={{ height: 4, borderRadius: 2 }}
                     />
                   </Box>
@@ -202,7 +216,7 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
                     Key Factors
                   </Typography>
                   <List dense sx={{ p: 0 }}>
-                    {prediction.factors.map((factor, index) => (
+                    {(prediction?.factors || []).map((factor: string, index: number) => (
                       <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
                         <ListItemIcon sx={{ minWidth: 24 }}>
                           <CheckCircle fontSize="small" color="success" />
@@ -221,7 +235,7 @@ const PredictiveAnalytics: React.FC<PredictiveAnalyticsProps> = ({ predictions }
         })}
       </Grid>
 
-      {predictions.length === 0 && (
+      {predictionsArray.length === 0 && (
         <Card>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
             <Psychology sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />

@@ -54,11 +54,31 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, Object>> logout(@RequestBody Map<String, String> logoutRequest) {
-        String username = logoutRequest.get("username");
-        authService.logout(username);
-        
-        Map<String, Object> response = Map.of("success", true, "message", "Logged out successfully");
-        return ResponseEntity.ok(response);
+        try {
+            String username = logoutRequest.get("username");
+            
+            if (username == null || username.trim().isEmpty()) {
+                logger.warn("Logout request received with null or empty username");
+                Map<String, Object> errorResponse = Map.of(
+                    "success", false,
+                    "message", "Username is required for logout"
+                );
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+            
+            logger.info("Logout request received for user: {}", username);
+            authService.logout(username);
+            
+            Map<String, Object> response = Map.of("success", true, "message", "Logged out successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error during logout request", e);
+            Map<String, Object> errorResponse = Map.of(
+                "success", false,
+                "message", "Internal server error during logout"
+            );
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
     @PostMapping("/validate")

@@ -16,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// JWT Filter is disabled for development
+// @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String SECRET_KEY = "your-secret-key-here-make-it-long-and-secure-in-production";
@@ -26,6 +28,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
+        // JWT authentication is disabled for development
+        // Simply pass through all requests without authentication
+        filterChain.doFilter(request, response);
+        
+        /*
         String header = request.getHeader(HEADER_STRING);
         
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
@@ -57,5 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+        */
     }
 } 

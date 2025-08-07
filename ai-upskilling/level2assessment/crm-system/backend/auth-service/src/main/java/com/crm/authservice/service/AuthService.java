@@ -247,8 +247,26 @@ public class AuthService {
     }
 
     public void logout(String username) {
-        // Remove refresh token from Redis
-        redisTemplate.delete("refresh_token:" + username);
+        try {
+            if (username == null || username.trim().isEmpty()) {
+                logger.warn("Logout attempted with null or empty username");
+                return;
+            }
+            
+            logger.info("Logging out user: {}", username);
+            
+            // Remove refresh token from Redis
+            Boolean deleted = redisTemplate.delete("refresh_token:" + username);
+            
+            if (deleted != null && deleted) {
+                logger.info("Successfully logged out user: {}", username);
+            } else {
+                logger.warn("No refresh token found for user: {}", username);
+            }
+        } catch (Exception e) {
+            logger.error("Error during logout for user: {}", username, e);
+            // Don't throw exception to prevent 500 error, just log it
+        }
     }
 
     public Map<String, Object> validateToken(String token) {

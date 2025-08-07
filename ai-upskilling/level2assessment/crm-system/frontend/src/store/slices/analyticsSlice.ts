@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { analyticsService } from '../../services/analyticsService';
+import analyticsService from '../../services/analyticsService';
 
 export interface AnalyticsReport {
   id: number;

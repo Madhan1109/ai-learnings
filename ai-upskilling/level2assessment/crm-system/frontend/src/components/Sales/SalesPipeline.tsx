@@ -23,7 +23,8 @@ import {
 
 interface Opportunity {
   id: number;
-  title: string;
+  title?: string; // Optional for backward compatibility
+  name?: string; // Optional for backward compatibility
   value: number;
   stage: string;
   probability: number;
@@ -75,11 +76,15 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
   };
 
   const getOpportunitiesByStage = (stage: string) => {
-    return opportunities.filter(opp => opp.stage === stage);
+    return opportunities?.filter(opp => opp.stage === stage) || [];
   };
 
   const getStageTotal = (stage: string) => {
     return getOpportunitiesByStage(stage).reduce((sum, opp) => sum + opp.value, 0);
+  };
+
+  const getOpportunityTitle = (opportunity: Opportunity) => {
+    return opportunity.title || opportunity.name || 'Untitled';
   };
 
   return (
@@ -102,7 +107,7 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                       {stage.label}
                     </Typography>
                     <Chip
-                      label={stageOpportunities.length}
+                      label={stageOpportunities?.length || 0}
                       size="small"
                       color={stage.color as any}
                       variant="outlined"
@@ -116,13 +121,12 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                   <Box sx={{ mb: 2 }}>
                     <LinearProgress
                       variant="determinate"
-                      value={(stageOpportunities.length / opportunities.length) * 100}
-                      color={stage.color as any}
-                      sx={{ height: 4, borderRadius: 2 }}
+                      value={opportunities?.length ? (stageOpportunities?.length || 0) / opportunities.length * 100 : 0}
+                      sx={{ height: 8, borderRadius: 4 }}
                     />
                   </Box>
                   
-                  <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                  <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
                     {stageOpportunities.map((opportunity) => (
                       <Card
                         key={opportunity.id}
@@ -131,42 +135,33 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                           p: 1,
                           cursor: 'pointer',
                           '&:hover': {
-                            boxShadow: 2,
+                            backgroundColor: 'action.hover',
                           },
                         }}
                         onClick={() => onView(opportunity)}
                       >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <Box sx={{ flexGrow: 1 }}>
+                          <Box sx={{ flex: 1 }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                              {opportunity.title}
+                              {getOpportunityTitle(opportunity)}
                             </Typography>
-                            
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                              <AttachMoney fontSize="small" color="success" />
-                              <Typography variant="caption" color="success.main" sx={{ fontWeight: 'bold' }}>
-                                {formatCurrency(opportunity.value)}
-                              </Typography>
-                            </Box>
-                            
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                              <CalendarToday fontSize="small" color="action" />
-                              <Typography variant="caption" color="text.secondary">
-                                {formatDate(opportunity.expectedCloseDate)}
-                              </Typography>
-                            </Box>
-                            
-                            <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              {formatCurrency(opportunity.value)}
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                               <LinearProgress
                                 variant="determinate"
                                 value={opportunity.probability}
-                                color="primary"
-                                sx={{ height: 2, borderRadius: 1 }}
+                                sx={{ flex: 1, height: 4 }}
+                                color={opportunity.probability >= 80 ? 'success' : opportunity.probability >= 50 ? 'warning' : 'error'}
                               />
                               <Typography variant="caption" color="text.secondary">
-                                {opportunity.probability}% probability
+                                {opportunity.probability}%
                               </Typography>
                             </Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Due: {formatDate(opportunity.expectedCloseDate)}
+                            </Typography>
                           </Box>
                           
                           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -181,7 +176,6 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                                 <Visibility fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            
                             <Tooltip title="Edit">
                               <IconButton
                                 size="small"
@@ -193,7 +187,6 @@ const SalesPipeline: React.FC<SalesPipelineProps> = ({
                                 <Edit fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            
                             <Tooltip title="Delete">
                               <IconButton
                                 size="small"

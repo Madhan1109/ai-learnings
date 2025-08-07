@@ -34,19 +34,14 @@ ChartJS.register(
   Legend
 );
 
-interface RevenueData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    borderColor?: string;
-    backgroundColor?: string;
-    tension?: number;
-  }[];
+interface RevenueDataPoint {
+  date: string;
+  revenue: number;
+  target: number;
 }
 
 interface RevenueChartProps {
-  data: RevenueData;
+  data?: RevenueDataPoint[];
   type?: 'line' | 'bar';
   title?: string;
   period?: string;
@@ -54,12 +49,32 @@ interface RevenueChartProps {
 }
 
 const RevenueChart: React.FC<RevenueChartProps> = ({
-  data = { labels: [], datasets: [] },
+  data = [],
   type = 'line',
   title = 'Revenue Analytics',
   period = '30d',
   onPeriodChange,
 }) => {
+  // Transform data to Chart.js format
+  const chartData = {
+    labels: (data || []).map(item => item.date) || [],
+    datasets: [
+      {
+        label: 'Revenue',
+        data: (data || []).map(item => item.revenue) || [],
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1,
+      },
+      {
+        label: 'Target',
+        data: (data || []).map(item => item.target) || [],
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        tension: 0.1,
+      },
+    ],
+  };
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -108,9 +123,9 @@ const RevenueChart: React.FC<RevenueChartProps> = ({
       <CardContent>
         <Box sx={{ height: 300 }}>
           {type === 'line' ? (
-            <Line data={data} options={options} />
+            <Line data={chartData} options={options} />
           ) : (
-            <Bar data={data} options={options} />
+            <Bar data={chartData} options={options} />
           )}
         </Box>
       </CardContent>

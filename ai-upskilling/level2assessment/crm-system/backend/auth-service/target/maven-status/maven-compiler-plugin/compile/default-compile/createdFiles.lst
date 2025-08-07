@@ -2,7 +2,6 @@ com\crm\authservice\AuthServiceApplication.class
 com\crm\authservice\config\WebSecurityConfig.class
 com\crm\authservice\service\JwtService.class
 com\crm\authservice\service\AuthService.class
-com\crm\authservice\config\CorsConfig.class
 com\crm\authservice\controller\AuthController.class
 com\crm\authservice\repository\UserRepository.class
 com\crm\authservice\entity\User.class

@@ -59,13 +59,18 @@ class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout');
+      // Get username from localStorage or use a default
+      const user = localStorage.getItem('user');
+      const username = user ? JSON.parse(user).username : 'default';
+      
+      await api.post('/auth/logout', { username });
     } catch (error: any) {
       // Even if logout fails on server, we should clear local storage
       console.warn('Logout failed on server:', error);
     } finally {
       // Always clear local storage
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }
 
