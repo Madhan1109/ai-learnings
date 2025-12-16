@@ -1,0 +1,162 @@
+package com.medical.config;
+
+import com.azure.ai.formrecognizer.DocumentAnalysisClient;
+import com.azure.ai.formrecognizer.DocumentAnalysisClientBuilder;
+import com.azure.ai.openai.OpenAIClient;
+import com.azure.ai.openai.OpenAIClientBuilder;
+import com.azure.core.credential.AzureKeyCredential;
+import com.azure.search.documents.SearchClient;
+import com.azure.search.documents.SearchClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+/**
+ * Configuration class for Azure AI services
+ * 
+ * This configuration:
+ * - Sets up Azure Document Intelligence client for OCR
+ * - Configures Azure OpenAI client for medical analysis
+ * - Initializes Azure Cognitive Search client for knowledge base
+ * - Optimizes settings for free tier usage
+ */
+@Configuration
+@Profile("!test") // Exclude from test profile
+public class AzureAIConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(AzureAIConfig.class);
+
+    @Value("${azure.form-recognizer.endpoint}")
+    private String formRecognizerEndpoint;
+
+    @Value("${azure.form-recognizer.api-key}")
+    private String formRecognizerApiKey;
+
+    @Value("${azure.openai.endpoint}")
+    private String openAiEndpoint;
+
+    @Value("${azure.openai.api-key}")
+    private String openAiApiKey;
+
+    @Value("${azure.search.endpoint}")
+    private String searchEndpoint;
+
+    @Value("${azure.search.api-key}")
+    private String searchApiKey;
+
+    @Value("${azure.search.index-name}")
+    private String searchIndexName;
+
+    /**
+     * Configure Azure Document Intelligence client
+     * Free tier: 500 pages/month
+     */
+    @Bean
+    public DocumentAnalysisClient documentAnalysisClient() {
+        if (isAzureServiceConfigured(formRecognizerEndpoint, formRecognizerApiKey)) {
+            logger.info("Initializing Azure Document Intelligence client");
+            return new DocumentAnalysisClientBuilder()
+                    .endpoint(formRecognizerEndpoint)
+                    .credential(new AzureKeyCredential(formRecognizerApiKey))
+                    .buildClient();
+        } else {
+            logger.warn("Azure Document Intelligence not configured - using mock client");
+            return createMockDocumentAnalysisClient();
+        }
+    }
+
+    /**
+     * Configure Azure OpenAI client
+     * Free tier: 1000 tokens/month
+     */
+    @Bean
+    public OpenAIClient openAIClient() {
+        if (isAzureServiceConfigured(openAiEndpoint, openAiApiKey)) {
+            logger.info("Initializing Azure OpenAI client");
+            return new OpenAIClientBuilder()
+                    .endpoint(openAiEndpoint)
+                    .credential(new AzureKeyCredential(openAiApiKey))
+                    .buildClient();
+        } else {
+            logger.warn("Azure OpenAI not configured - using mock client");
+            return createMockOpenAIClient();
+        }
+    }
+
+    /**
+     * Configure Azure Cognitive Search client
+     * Free tier: 1 index, 10,000 documents
+     */
+    @Bean
+    public SearchClient searchClient() {
+        if (isAzureServiceConfigured(searchEndpoint, searchApiKey)) {
+            logger.info("Initializing Azure Cognitive Search client");
+            return new SearchClientBuilder()
+                    .endpoint(searchEndpoint)
+                    .credential(new AzureKeyCredential(searchApiKey))
+                    .indexName(searchIndexName)
+                    .buildClient();
+        } else {
+            logger.warn("Azure Cognitive Search not configured - using mock client");
+            return createMockSearchClient();
+        }
+    }
+
+    /**
+     * Check if Azure service is properly configured
+     */
+    private boolean isAzureServiceConfigured(String endpoint, String apiKey) {
+        return endpoint != null && 
+               !endpoint.contains("your-resource") && 
+               apiKey != null && 
+               !apiKey.equals("your-api-key");
+    }
+
+    /**
+     * Create mock Document Analysis client for development/testing
+     */
+    private DocumentAnalysisClient createMockDocumentAnalysisClient() {
+        logger.info("Creating mock Document Analysis client for development");
+        // Return a mock implementation that can be used for development
+        return null; // Will be implemented as needed
+    }
+
+    /**
+     * Create mock OpenAI client for development/testing
+     */
+    private OpenAIClient createMockOpenAIClient() {
+        logger.info("Creating mock OpenAI client for development");
+        // Return a mock implementation that can be used for development
+        return null; // Will be implemented as needed
+    }
+
+    /**
+     * Create mock Search client for development/testing
+     */
+    private SearchClient createMockSearchClient() {
+        logger.info("Creating mock Search client for development");
+        // Return a mock implementation that can be used for development
+        return null; // Will be implemented as needed
+    }
+
+    // Configuration validation methods
+    public boolean isFormRecognizerAvailable() {
+        return isAzureServiceConfigured(formRecognizerEndpoint, formRecognizerApiKey);
+    }
+
+    public boolean isOpenAIAvailable() {
+        return isAzureServiceConfigured(openAiEndpoint, openAiApiKey);
+    }
+
+    public boolean isSearchAvailable() {
+        return isAzureServiceConfigured(searchEndpoint, searchApiKey);
+    }
+
+    public String getFormRecognizerEndpoint() { return formRecognizerEndpoint; }
+    public String getOpenAiEndpoint() { return openAiEndpoint; }
+    public String getSearchEndpoint() { return searchEndpoint; }
+    public String getSearchIndexName() { return searchIndexName; }
+}

@@ -1,0 +1,56 @@
+# NVIDIA NeMo Guardrails Configuration
+# This configuration blocks sensitive information in both input and output
+
+models:
+  - type: main
+    engine: openai
+    model: gpt-4-turbo-preview
+
+instructions:
+  - type: general
+    content: |
+      You are a professional candidate search assistant. Always maintain privacy and security.
+      Do not expose sensitive personal information like:
+      - Social Security Numbers
+      - Credit Card Numbers
+      - Passwords
+      - Home Addresses
+      - Phone Numbers
+      - Email Addresses (unless explicitly required)
+      - Financial Information
+
+rails:
+  input:
+    flows:
+      - check_sensitive_info
+      - check_profanity
+      - check_pii
+  
+  output:
+    flows:
+      - check_sensitive_info
+      - check_profanity
+      - check_pii
+      - validate_response
+
+flows:
+  - name: check_sensitive_info
+    steps:
+      - Check for sensitive patterns (SSN, credit cards, etc.)
+      - Block if detected
+  
+  - name: check_profanity
+    steps:
+      - Check for inappropriate language
+      - Block if detected
+  
+  - name: check_pii
+    steps:
+      - Check for personally identifiable information
+      - Sanitize if detected
+  
+  - name: validate_response
+    steps:
+      - Ensure response is relevant and professional
+      - Validate format
+

@@ -1,0 +1,15 @@
+# CrewAI Hands-On Exercise Requirements
+
+# Core CrewAI packages
+crewai>=0.1.0
+crewai-tools>=0.1.0
+
+# Optional: For web search capabilities
+# serper>=1.0.0
+
+# Optional: For environment variable management
+python-dotenv>=1.0.0
+
+# Optional: For better output formatting
+rich>=13.0.0
+

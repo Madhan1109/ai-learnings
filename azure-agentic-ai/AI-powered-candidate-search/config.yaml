@@ -1,0 +1,83 @@
+# AI-Powered Candidate Search Configuration
+
+# Agent Configuration
+agents:
+  document_parser:
+    name: "Document Parser Agent"
+    role: "Extract key information from job descriptions"
+    goal: "Identify skills, experience requirements, and keywords from job descriptions"
+    backstory: "You are an expert at analyzing job descriptions and extracting critical information"
+    max_iter: 3
+    verbose: true
+
+  github_searcher:
+    name: "GitHub Search Agent"
+    role: "Search GitHub for matching developer profiles"
+    goal: "Find GitHub profiles matching the job requirements"
+    backstory: "You are a GitHub expert who can find developers based on their code repositories and contributions"
+    max_iter: 5
+    verbose: true
+
+  web_linkedin_searcher:
+    name: "Web/LinkedIn Search Agent"
+    role: "Search web and LinkedIn for candidate profiles"
+    goal: "Find professional profiles matching job requirements"
+    backstory: "You are a recruitment expert who searches across web and LinkedIn to find qualified candidates"
+    max_iter: 5
+    verbose: true
+
+  profile_summarizer:
+    name: "Profile Summarizer Agent"
+    role: "Summarize candidate profiles with key highlights"
+    goal: "Create concise summaries highlighting candidate strengths"
+    backstory: "You are an expert at analyzing candidate profiles and creating compelling summaries"
+    max_iter: 3
+    verbose: true
+
+# Workflow Configuration
+workflow:
+  max_candidates: 10
+  search_timeout: 30
+  parallel_searches: true
+  enable_caching: true
+
+# LLM Configuration
+llm:
+  provider: "litellm"
+  model: "gpt-4-turbo-preview"
+  temperature: 0.3
+  max_tokens: 2000
+
+# Guardrails Configuration
+guardrails:
+  enabled: true
+  config_path: "./guardrails/config.yml"
+  block_sensitive_info: true
+  input_filtering: true
+  output_filtering: true
+
+# API Configuration
+apis:
+  github:
+    rate_limit: 5000
+    timeout: 30
+    retry_attempts: 3
+  
+  linkedin:
+    rate_limit: 100
+    timeout: 30
+    retry_attempts: 3
+  
+  web_search:
+    rate_limit: 100
+    timeout: 30
+    retry_attempts: 3
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  file: "logs/candidate_search.log"
+  max_size: "10MB"
+  backup_count: 5
+

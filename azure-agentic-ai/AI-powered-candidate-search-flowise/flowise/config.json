@@ -1,0 +1,32 @@
+{
+  "flowise": {
+    "host": "http://localhost:3000",
+    "api_key": null,
+    "chatflow_id": "candidate-search",
+    "timeout": 30
+  },
+  "tools": {
+    "document_parser": {
+      "path": "flowise/custom_tools/document_parser.py",
+      "class": "DocumentParserTool"
+    },
+    "github_search": {
+      "path": "flowise/custom_tools/github_search.py",
+      "class": "GitHubSearchTool"
+    },
+    "web_search": {
+      "path": "flowise/custom_tools/web_search.py",
+      "class": "WebSearchTool"
+    },
+    "profile_analyzer": {
+      "path": "flowise/custom_tools/profile_analyzer.py",
+      "class": "ProfileAnalyzerTool"
+    }
+  },
+  "workflow": {
+    "max_candidates": 10,
+    "parallel_searches": true,
+    "enable_caching": true
+  }
+}
+

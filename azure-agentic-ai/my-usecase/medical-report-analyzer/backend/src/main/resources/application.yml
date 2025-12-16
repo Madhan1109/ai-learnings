@@ -1,0 +1,108 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: medical-report-analyzer
+  profiles:
+    active: azure  # Change to 'azure' to use real Azure services
+  
+  datasource:
+    url: jdbc:h2:mem:medical_reports
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  security:
+    user:
+      name: admin
+      password: admin123
+  
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# Azure AI Services Configuration (Free Tier Optimized)
+azure:
+  openai:
+    endpoint: ${AZURE_OPENAI_ENDPOINT:https://your-resource.openai.azure.com/}
+    api-key: ${AZURE_OPENAI_API_KEY:your-api-key}
+    deployment-name: ${AZURE_OPENAI_DEPLOYMENT_NAME:gpt-4}
+    max-tokens: 500  # Optimized for free tier (1000 tokens/month)
+    temperature: 0.1  # Low temperature for medical accuracy
+  
+  form-recognizer:
+    endpoint: ${AZURE_FORM_RECOGNIZER_ENDPOINT:https://your-resource.cognitiveservices.azure.com/}
+    api-key: ${AZURE_FORM_RECOGNIZER_API_KEY:your-api-key}
+    max-pages-per-month: 500  # Free tier limit
+  
+  search:
+    endpoint: ${AZURE_SEARCH_ENDPOINT:https://your-search-service.search.windows.net}
+    api-key: ${AZURE_SEARCH_API_KEY:your-api-key}
+    index-name: medical-knowledge
+
+# Application Settings
+app:
+  medical:
+    knowledge-base:
+      # Pre-populated medical knowledge for common injuries
+      knee-injury:
+        - "Rest and ice application for 48-72 hours"
+        - "Elevation to reduce swelling"
+        - "Compression with elastic bandage"
+        - "Physical therapy exercises after initial healing"
+      back-injury:
+        - "Gentle stretching exercises"
+        - "Core strengthening"
+        - "Proper posture maintenance"
+        - "Gradual return to normal activities"
+      shoulder-injury:
+        - "Range of motion exercises"
+        - "Strengthening with resistance bands"
+        - "Avoid overhead activities initially"
+        - "Gradual progression to full function"
+  
+  security:
+    jwt:
+      secret: ${JWT_SECRET:your-jwt-secret-key-here}
+      expiration: 86400000  # 24 hours in milliseconds
+  
+  file:
+    upload:
+      allowed-types: pdf,jpg,jpeg,png
+      max-size: 10485760  # 10MB
+      storage-path: ./uploads
+
+# Logging Configuration
+logging:
+  level:
+    com.medical: DEBUG
+    com.azure: INFO
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

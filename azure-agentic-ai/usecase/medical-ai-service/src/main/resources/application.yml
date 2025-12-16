@@ -1,0 +1,91 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: medical-ai-service
+  
+  datasource:
+    url: jdbc:postgresql://postgres:5432/crm_system
+    username: crm_user
+    password: crm_password
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8084/oauth2/jwks
+
+# Eureka Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Azure AI Services Configuration
+azure:
+  ai:
+    openai:
+      endpoint: ${AZURE_OPENAI_ENDPOINT:https://your-resource.openai.azure.com/}
+      api-key: ${AZURE_OPENAI_API_KEY:your-api-key}
+      deployment-name: ${AZURE_OPENAI_DEPLOYMENT_NAME:gpt-4}
+      max-tokens: 4000
+      temperature: 0.3
+    
+    formrecognizer:
+      endpoint: ${AZURE_FORM_RECOGNIZER_ENDPOINT:https://your-resource.cognitiveservices.azure.com/}
+      api-key: ${AZURE_FORM_RECOGNIZER_API_KEY:your-api-key}
+    
+    search:
+      endpoint: ${AZURE_SEARCH_ENDPOINT:https://your-search-service.search.windows.net}
+      api-key: ${AZURE_SEARCH_API_KEY:your-api-key}
+      index-name: medical-documents
+  
+  storage:
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING:your-storage-connection-string}
+    container-name: medical-documents
+
+# Security Configuration
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-jwt-secret-key-here}
+    expiration: 86400000 # 24 hours
+  
+  content-safety:
+    enabled: true
+    categories:
+      - hate
+      - sexual
+      - violence
+      - self-harm
+
+# Logging Configuration
+logging:
+  level:
+    com.crm.medicalaiservice: DEBUG
+    com.azure: INFO
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always

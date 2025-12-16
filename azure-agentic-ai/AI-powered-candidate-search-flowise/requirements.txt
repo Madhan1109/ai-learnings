@@ -1,0 +1,68 @@
+# Core Framework
+# Note: Flowise is installed via npm, not pip
+# npm install -g flowise
+
+# LLM Gateway
+litellm==1.34.0
+openai==1.12.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+
+# Guardrails
+nemoguardrails>=0.5.0
+guardrails-ai>=0.4.0
+
+# Document Processing
+python-docx==1.1.0
+pypdf2==3.0.1
+python-multipart==0.0.6
+
+# API Integrations
+requests==2.31.0
+httpx==0.26.0
+aiohttp==3.9.1
+
+# GitHub MCP
+github3.py==3.2.0
+PyGithub==2.1.1
+
+# Web Search & LinkedIn
+beautifulsoup4==4.12.3
+selenium==4.17.2
+linkedin-api==2.0.0
+serpapi==0.1.5
+
+# Data Processing
+# Using latest versions with pre-built wheels for Python 3.13
+pandas>=2.2.0
+numpy>=1.26.0
+
+# Environment & Config
+python-dotenv==1.0.1
+# Pydantic - use latest version with pre-built wheels for Python 3.13
+pydantic>=2.9.0
+pydantic-settings>=2.6.0
+
+# Logging & Monitoring
+loguru==0.7.2
+prometheus-client==0.19.0
+
+# FastAPI for API endpoints
+fastapi==0.109.0
+uvicorn==0.27.0
+
+# Flowise Integration
+# Note: Flowise SDK is optional, using direct API calls instead
+
+# Utilities
+tenacity==8.2.3
+tqdm==4.66.1
+pyyaml==6.0.1
+
+# Security
+cryptography==42.0.2
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+
