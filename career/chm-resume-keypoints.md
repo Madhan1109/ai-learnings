@@ -4,10 +4,11 @@
 **Backend:** Java, Spring Boot, Spring Data JPA / Hibernate, REST APIs, Microservices, Python  
 **Frontend:** React, TypeScript, Vite, MUI, Tailwind CSS  
 **Database / Cache:** MySQL, PostgreSQL, SQL Server, FHIR, Amazon ElastiCache (Redis)  
-**Cloud / AWS:** API Gateway, Lambda, ECS, EC2, SNS, SQS, S3, CloudFront, Secrets Manager, EventBridge, VPC, IAM / OIDC, CloudWatch  
+**Cloud / AWS:** API Gateway, Lambda, ECS, ECR, EC2, SNS, SQS, S3, CloudFront, Secrets Manager, EventBridge, VPC, IAM / OIDC, CloudWatch  
 **Data / Analytics:** Databricks (SQL Statements API)  
 **Auth / Security:** Okta OIDC (PKCE), JWT  
-**Infra / DevOps:** Terraform, GitHub Actions, Git, Bitbucket  
+**Infra / IaC:** Terraform  
+**Build, Test & CI/CD:** Maven, JUnit, Jenkins, Docker, GitHub Actions, Git, Bitbucket  
 **API / Contracts:** OpenAPI  
 **Methodology & tools:** Agile, Jira, Confluence, IntelliJ, Cursor (AI-assisted development)
 
