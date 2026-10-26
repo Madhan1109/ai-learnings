@@ -3,6 +3,14 @@
 *The Cigna Group · Full-stack · AWS Serverless*  
 *Saved for resume / contribution updates — professional wording (no internal jargon).*
 
+## Project title
+
+**Client Health Monitor — Sales Portfolio Analytics Platform**
+
+## Summary (one sentence above bullets)
+
+Built from the ground up a sales portfolio analytics platform at The Cigna Group that helps account managers and leadership monitor client health and risk—delivering a React SPA, Python/AWS serverless APIs, and a Databricks-to-Redis data pipeline across multi-environment releases.
+
 ## Skills
 
 React, TypeScript, Vite, MUI, Tailwind CSS, Python, AWS Lambda, API Gateway, ElastiCache Redis, S3, CloudFront, Secrets Manager, EventBridge, VPC, IAM/OIDC, Terraform, Databricks, Okta, OpenAPI, GitHub Actions, Cursor (AI-assisted development)
@@ -15,7 +23,3 @@ React, TypeScript, Vite, MUI, Tailwind CSS, Python, AWS Lambda, API Gateway, Ela
 - Designed Redis portfolio aggregates and REST APIs for account-manager and leadership views (summary, priority clients, risk, renewals, map, client detail, KPI history).
 - Owned **S3** static hosting, **CloudFront** UI/API routing, **VPC** Lambdas, **Secrets Manager**, **EventBridge** schedules, and **GitHub Actions OIDC** deploys (no long-lived AWS keys).
 - Delivered CI/CD across UI/API/infra repos; validated load/API Lambdas with tests and CloudWatch; stood up an isolated **S3/CloudFront** prototype pipeline for UX validation without impacting production.
-
-## Project title (optional)
-
-**Client Health Monitor — Sales Portfolio Analytics Platform**
