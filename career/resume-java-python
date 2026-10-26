@@ -1,0 +1,96 @@
+							
+Madhan M S
+Associate Technical Architect (10+ years exp)
+                                                                       
+                                                          
+Associate Technical Architect with strong expertise in Java, Spring Boot, and microservices-based architectures, specializing in the design and delivery of scalable, multi-tier web applications. Proven track record of taking initiatives from proof of concept to production-ready deployments. Brings deep hands-on experience with Spring-based backends, RESTful services, object-oriented design, and full SDLC participation—including requirements gathering, analysis, solution design, estimation, and testing. Known for effective collaboration with cross-functional and geographically distributed teams, bridging technical and business needs to deliver high-quality solutions.
+
+
+
+
+
+SKILLS
+Backend: 
+Java, Spring Boot, Spring JPA/Hibernate, Microservices, Python
+Database / Cache: 
+MySQL, PostgreSQL, FHIR, SQL Server, Amazon ElasticCache(Redis)
+
+Cloud / AWS: 
+API Gateway, Lambda, ECS, EC2, SNS, SQS, S3, CloudFront, Secrets Manager, EventBridge, VPC, IAM / OIDC, CloudWatch
+Methodology & Tools: 
+Agile, Jira, IntelliJ, Confluence, Cursor(AI-assisted Development)
+Version Control: 
+GIT, BITBUCKET
+
+EDUCATION
+
+B.E (E.E.E) - AAMEC College of Engineering, ANNA University
+
+
+
+EXPERIENCE
+ Professional summary and Key highlights
+
+Java and Spring ecosystem: Hands-on development with Java and Spring Boot, including REST APIs, microservices, and service-oriented design. Focus on maintainable structure, clear boundaries between services, and patterns suited to distributed systems.
+SDLC and solution design: Contributed across the full lifecycle: requirements, analysis, technical design, estimation, build, test, and release. Involved in application and data-layer design from early planning through production rollout.
+Quality, reviews, and standards: Participates in code reviews (Java) and test coverage discussions. Experience driving code quality practices; introduced or expanded use of SonarQube for static analysis and consistency with team standards.
+AWS: Practical use of core services such as Lambda, SNS, SQS, ECS, ECR, and CloudWatch. Experience with serverless patterns on Lambda where applicable; containerized workloads on ECS/ECR with attention to scaling, observability, and secure configuration (security groups, IAM). Implemented CI/CD with Jenkins integrated with AWS, automating build, test, and deployment to ECS/ECR.
+Containers: Docker for building and running services in consistent environments and supporting cloud deployments.
+Data: Work with relational stores (MySQL, PostgreSQL) and object storage (S3) as appropriate to the application.
+Delivery: Git-based workflows and Jenkins for CI/CD and repeatable releases.
+Performance: Performance tuning and optimization for business-critical applications, improving latency, scalability, and throughput where measured bottlenecks existed.
+
+
+
+
+PROJECT DETAILS
+The Cigna Group
+Built from the ground up a sales portfolio analytics platform at The Cigna Group that helps account managers and leadership monitor client health and risk—delivering a React SPA, Python/AWS serverless APIs, and a Databricks-to-Redis data pipeline across multi-environment releases.
+Built from the ground up a multi-environment (dev/test/prod) sales portfolio analytics platform using React, TypeScript, Vite, MUI, Tailwind, and Python on AWS Lambda, with infrastructure as code in Terraform.
+Developed an authenticated SPA with Okta OIDC (PKCE) featuring KPI dashboards, client grids, advanced filters/search, client-detail domain metrics, and churn-driver views.
+Implemented a serverless data path: Databricks → scheduled Lambda load → ElastiCache Redis → API Gateway → CloudFront, with OpenAPI contracts and cache-ready error handling.
+Designed Redis portfolio aggregates and REST APIs for account-manager and leadership views (summary, priority clients, risk, renewals, map, client detail, KPI history).
+Owned S3 static hosting, CloudFront UI/API routing, VPC Lambdas, Secrets Manager, EventBridge schedules, and GitHub Actions OIDC deploys (no long-lived AWS keys).
+Delivered CI/CD across UI/API/infra repos; validated load/API Lambdas with tests and CloudWatch; stood up an isolated S3/CloudFront prototype pipeline for UX validation without impacting production.
+
+
+Medtronic LABS
+Led development and operations of Java/Spring Boot microservices and FHIR-based integrations for high-volume healthcare workloads, including reporting, legacy modernization, and PostgreSQL-backed services.
+Led backend work for Java / Spring Boot microservices processing high transaction volumes across application and data tiers.
+Implemented a FHIR-oriented integration layer in Java and Spring Boot to exchange patient-related data with third parties using REST and the FHIR standard.
+Delivered Spring Boot microservices and REST APIs across modules for patient data processing and integration with external healthcare systems.
+Built Java/Spring Boot services backing Amazon QuickSight reporting for multiple LABS tools, enabling tracking and analysis for downstream decisions.
+Migrated a legacy system to Java and Spring Boot, improving performance, maintainability, and alignment with microservices and modern API practices.
+Designed services with Spring Boot, REST APIs, and Hibernate/JPA against PostgreSQL for consistent data access and transactional integrity.
+Used the Java toolchain (Maven, JUnit, Spring Boot, Hibernate) for build, delivery, and automated testing.
+Applied security controls for sensitive healthcare data (e.g. least-privilege IAM, encryption in transit/at rest, and secure API access patterns) consistent with organizational policies; implemented or integrated authentication/authorization for APIs (e.g. OAuth2/OIDC or platform-standard identity) where required by the architecture.
+Improved operational readiness: structured logging, dashboards, and alerting to track latency, errors, and dependency health at scale; contributed to performance and capacity work (profiling, query/API tuning, caching where appropriate) to sustain growth in transaction volume.
+
+Roche
+Contributed to the development and operations of Java/Spring Boot healthcare microservices on AWS ECS, delivering REST APIs and resilient deployment patterns for clinical data and US stakeholder support.
+Delivered healthcare microservices on Java and Spring Boot, exposing REST APIs for patient data and clinical workflows with clear contracts and versioning suitable for regulated environments.
+Built REST APIs for clinical records, medical history, and diagnostics, including validation, error handling, and integration points aligned with clinical data flows.
+Containerized services with Docker and ran them on AWS ECS, configuring auto-scaling and load balancing for availability under variable load.
+Added health checks and observability with CloudWatch (metrics, alarms, and logs as applicable) for operational visibility and faster incident detection.
+Wrote automated tests with JUnit and Spring Boot Test (and API-level tests where used), improving regression safety and endpoint reliability.
+Worked in Agile delivery with Jira; participated in Scrum ceremonies, pull-request reviews, and architecture feedback to keep changes maintainable and consistent.
+Ran internal knowledge-sharing sessions after major increments to spread context and incorporate feedback.
+Supported US stakeholders with troubleshooting and technical guidance during rollout and steady-state operations.
+Applied security controls for sensitive healthcare data (e.g. least-privilege IAM, encryption in transit/at rest, and secure API access patterns) consistent with organizational policies.
+Implemented or integrated authentication/authorization for APIs (e.g. OAuth2/OIDC or platform-standard identity) where required by the architecture.
+
+Oracle
+Delivered Java/Spring Boot integrations and services for Oracle internal applications, covering full SDLC delivery, multi-database persistence, and production support with strong API documentation.
+Partnered with Oracle stakeholders on requirements and API/service design; worked in Agile with Jira, Scrum ceremonies, and PR reviews with architecture oversight.
+Built integrations between Oracle internal systems using Java, Spring Boot, and REST, handling large-scale request and data flows with attention to throughput and consistency.
+Owned phases of the SDLC—design, implementation, testing, and production rollout—for Spring Boot services, with JUnit / Spring Boot Test and integration tests where appropriate.
+Modeled persistence with JPA/Hibernate and Spring Data patterns on PostgreSQL and MySQL; used Redis for caching/session or rate-sensitive data where required.
+Performed code reviews, debugging, and production troubleshooting on Java services, aligning teams on standards for API design, error handling, and maintainability.
+Produced API, data model, and technical documentation to support onboarding and long-term ownership.
+
+Ericsson
+Led end-to-end delivery of Java/Spring Boot microservices on PostgreSQL, coordinating the team, stakeholder requirements, Agile execution, and production stability including performance tuning.
+Drove delivery end-to-end—from requirements through production—for Java / Spring Boot microservices with Hibernate/JPA and PostgreSQL.
+Led/coordinated the development team with stakeholders: clarified requirements, broke work into API and service tasks, and tracked execution to release.
+Applied Agile practices with Jira; used PR reviews with the technical architect to enforce solid Spring, REST, and ORM usage.
+Supported production for Spring Boot services: incident response, stability work, and tuning of database access and REST layers for performance and reliability.
