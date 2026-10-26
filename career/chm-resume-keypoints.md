@@ -1,3 +1,19 @@
+#manual
+SKILLS
+Backend: 
+Java, Spring Boot, Spring JPA/Hibernate, Microservices 
+Database: 
+MySQL, PostgreSQL, FHIR DB, SQL Server
+
+Cloud: 
+AWS (API Gateway, Lambda, ECS, EC2, SNS, SQS, S3, CloudWatch)
+Methodology: 
+Agile
+Process & Tools: 
+Jira, IntelliJ, Confluence
+Version Control: 
+GIT, BITBUCKET
+
 # Client Health Monitor — Resume Key Points
 
 *The Cigna Group · Full-stack · AWS Serverless*  
